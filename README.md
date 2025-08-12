@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend Farmácia
 
-## Getting Started
+Arquitetura: Next.js (App Router), TypeScript, React Query, Axios, Radix UI, Tailwind, Design System custom.
 
-First, run the development server:
+## Scripts
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- dev: desenvolvimento
+- build/start: produção
+- lint / type-check
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Config
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+API base: `NEXT_PUBLIC_API_BASE_URL` (.env.local)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Autenticação
 
-## Learn More
+Access token em memória/sessionStorage. Refresh httpOnly cookie (backend). Interceptor renova em 401.
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- src/domain: DTOs
+- src/services: chamadas HTTP puras
+- src/lib: infraestrutura (axios, react-query)
+- src/context: Auth
+- src/design-system: componentes reutilizáveis
+- src/components: composição/páginas
+- src/app: rotas App Router
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Próximos Passos
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Forms com react-hook-form + zod
+- Testes (Vitest / RTL)
+- Internationalization (next-intl)
+- CI pipeline (lint, typecheck, build)

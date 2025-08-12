@@ -1,0 +1,11 @@
+{
+  "extends": ["next", "next/core-web-vitals"],
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "import/order": [
+      "error",
+      { "alphabetize": { "order": "asc", "caseInsensitive": true } }
+    ]
+  }
+}
