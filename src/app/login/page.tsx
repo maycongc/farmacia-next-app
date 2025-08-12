@@ -1,13 +1,21 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
 import { Input } from '@/design-system/components/Input';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const searchParams = useSearchParams();
   const unauthorized = searchParams.get('unauthorized');
   const { login } = useAuth();
