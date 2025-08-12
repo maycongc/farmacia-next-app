@@ -1,4 +1,5 @@
 'use client';
+import { Check } from 'lucide-react';
 import React from 'react';
 
 interface CustomCheckboxProps {
@@ -15,9 +16,16 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
   onChange,
 }) => (
   <label
-    className={`inline-flex items-center justify-center w-5 h-5 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 cursor-pointer ${
-      checked ? 'bg-primary-100 dark:bg-primary-900' : ''
-    } ${className ?? ''}`}
+    className={`inline-flex items-center justify-center w-5 h-5 rounded border
+      ${
+        checked
+          ? 'border-blue-400 dark:border-primary-600'
+          : 'border-gray-300 dark:border-gray-700'
+      }
+      bg-white dark:bg-gray-900
+      ${checked ? 'bg-blue-400/90 dark:bg-blue-800' : ''}
+      ${onChange ? 'cursor-pointer' : 'opacity-60 cursor-not-allowed'}
+      ${className ?? ''}`}
   >
     <input
       type="checkbox"
@@ -26,25 +34,12 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({
       className="sr-only"
       aria-checked={checked}
       readOnly={!onChange}
+      disabled={!onChange}
     />
     {indeterminate ? (
       <span className="block w-3 h-0.5 bg-primary-600 rounded" />
     ) : checked ? (
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 20 20"
-        fill="none"
-        className="text-primary-600"
-      >
-        <path
-          d="M5 10l3 3 7-7"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <Check size={16} className="text-primary-600" />
     ) : null}
   </label>
 );

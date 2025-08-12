@@ -7,6 +7,7 @@ interface PaginationProps {
   className?: string;
 }
 
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 import { Button } from '@/design-system/components/Button';
 import CustomSelect from '@/design-system/components/CustomSelect';
@@ -80,114 +81,87 @@ export function Pagination({
           <span className="font-bold">{totalItems}</span> registros
         </span>
       </div>
-      <div className="flex flex-wrap items-center gap-1 w-full">
-        <Button
-          intent="ghost"
-          size="sm"
-          onClick={() => handleSetPage(Math.max(page - 1, 0))}
-          disabled={page === 0}
-          className="rounded-full px-2 flex items-center justify-center"
-          aria-label="Página anterior"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="inline-block align-middle"
+      <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 w-full">
+        <div className="flex flex-row flex-wrap items-center gap-1 w-full sm:w-auto justify-center">
+          <Button
+            intent="ghost"
+            size="sm"
+            onClick={() => handleSetPage(Math.max(page - 1, 0))}
+            disabled={page === 0}
+            className="rounded-full px-2 flex items-center justify-center"
+            aria-label="Página anterior"
           >
-            <path
-              d="M11.25 14.25L6.75 9L11.25 3.75"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Button>
-
-        <nav
-          aria-label="Navegação de páginas"
-          className="flex items-center gap-0.5"
-        >
-          {pages.map((p, idx) =>
-            typeof p === 'number' ? (
-              <Button
-                key={`page-${p}`}
-                intent={p === page ? 'primary' : 'ghost'}
-                size="sm"
-                onClick={() => handleSetPage(p)}
-                disabled={p === page}
-                className={`rounded px-2 transition-all duration-150 ${
-                  p === page
-                    ? 'bg-blue-600 text-white shadow'
-                    : 'hover:bg-blue-100'
-                } ${p === page ? 'font-bold' : ''}`}
-                aria-current={p === page ? 'page' : undefined}
-                aria-label={`Ir para página ${p + 1}`}
-              >
-                {p + 1}
-              </Button>
-            ) : (
-              <span
-                key={p}
-                className="text-sm px-2 text-gray-400 select-none font-bold"
-                aria-hidden="true"
-              >
-                ...
-              </span>
-            ),
-          )}
-        </nav>
-
-        <Button
-          intent="ghost"
-          size="sm"
-          onClick={() => handleSetPage(Math.min(page + 1, totalPages - 1))}
-          disabled={page === totalPages - 1}
-          className="rounded-full px-2 flex items-center justify-center"
-          aria-label="Próxima página"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="inline-block align-middle"
+            <ChevronLeft size={18} className="inline-block align-middle" />
+          </Button>
+          <nav
+            aria-label="Navegação de páginas"
+            className="flex items-center gap-0.5"
           >
-            <path
-              d="M6.75 3.75L11.25 9L6.75 14.25"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </Button>
-
-        <div className="ml-4 flex-shrink-0 min-w-[120px] max-w-[220px] w-fit flex items-center">
-          <CustomSelect
-            label="Itens por página"
-            labelPosition="side"
-            options={pageSizeOptions.map(v => ({ value: v, label: String(v) }))}
-            value={pageSize}
-            onChange={v => handlePageSizeChange(Number(v))}
-          />
+            {pages.map((p, idx) =>
+              typeof p === 'number' ? (
+                <Button
+                  key={`page-${p}`}
+                  intent={p === page ? 'primary' : 'ghost'}
+                  size="sm"
+                  onClick={() => handleSetPage(p)}
+                  disabled={p === page}
+                  className={`rounded px-2 transition-all duration-150 ${
+                    p === page
+                      ? 'bg-blue-600 text-white shadow'
+                      : 'hover:bg-blue-100'
+                  } ${p === page ? 'font-bold' : ''}`}
+                  aria-current={p === page ? 'page' : undefined}
+                  aria-label={`Ir para página ${p + 1}`}
+                >
+                  {p + 1}
+                </Button>
+              ) : (
+                <span
+                  key={p}
+                  className="text-sm px-2 text-gray-400 select-none font-bold"
+                  aria-hidden="true"
+                >
+                  ...
+                </span>
+              ),
+            )}
+          </nav>
+          <Button
+            intent="ghost"
+            size="sm"
+            onClick={() => handleSetPage(Math.min(page + 1, totalPages - 1))}
+            disabled={page === totalPages - 1}
+            className="rounded-full px-2 flex items-center justify-center"
+            aria-label="Próxima página"
+          >
+            <ChevronRight size={18} className="inline-block align-middle" />
+          </Button>
         </div>
-
-        <div className="ml-2 flex-shrink-0 min-w-[120px] max-w-[220px] w-fit flex items-center">
-          <CustomSelect
-            label="Ir para página"
-            labelPosition="side"
-            options={Array.from({ length: totalPages }, (_, i) => ({
-              value: i,
-              label: String(i + 1),
-            }))}
-            value={page}
-            onChange={v => handleSetPage(Number(v))}
-          />
+        <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto justify-center">
+          <div className="flex-shrink-0 min-w-[120px] max-w-[220px] w-fit flex items-center">
+            <CustomSelect
+              label="Itens por página"
+              labelPosition="side"
+              options={pageSizeOptions.map(v => ({
+                value: v,
+                label: String(v),
+              }))}
+              value={pageSize}
+              onChange={v => handlePageSizeChange(Number(v))}
+            />
+          </div>
+          <div className="flex-shrink-0 min-w-[120px] max-w-[220px] w-fit flex items-center">
+            <CustomSelect
+              label="Ir para página"
+              labelPosition="side"
+              options={Array.from({ length: totalPages }, (_, i) => ({
+                value: i,
+                label: String(i + 1),
+              }))}
+              value={page}
+              onChange={v => handleSetPage(Number(v))}
+            />
+          </div>
         </div>
       </div>
     </div>

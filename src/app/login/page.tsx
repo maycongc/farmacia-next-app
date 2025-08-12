@@ -1,13 +1,28 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { Button } from '@/design-system/components/Button';
 import { Card } from '@/design-system/components/Card';
 import { Input } from '@/design-system/components/Input';
+import { Loader } from '@/design-system/feedback/Loader';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    if (user) {
+      router.replace('/');
+    }
+  }, [user, router]);
+  if (loading || user) {
+    return (
+      <div className="w-full flex justify-center items-center pt-32">
+        <Loader />
+      </div>
+    );
+  }
   return (
     <Suspense>
       <LoginContent />

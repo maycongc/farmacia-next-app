@@ -1,11 +1,20 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { AppHeader } from './AppHeader';
 import { AppSidebar } from './AppSidebar';
+import { useSidebar } from '@/context/SidebarContext';
 import { Loader } from '@/design-system/feedback/Loader';
 import { useAuth } from '@/hooks/useAuth';
 
 export function Protected({ children }: { children: React.ReactNode }) {
+  const { sidebarVisible, setSidebarVisible } = useSidebar();
+  useEffect(() => {
+    const handler = () => setSidebarVisible(true);
+    window.addEventListener('sidebar-toggle', handler);
+    return () => window.removeEventListener('sidebar-toggle', handler);
+  }, [setSidebarVisible]);
+
   const { user, loading } = useAuth();
   const router = useRouter();
   const [redirected, setRedirected] = useState(false);
@@ -13,7 +22,7 @@ export function Protected({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loading && !user) {
       setRedirected(true);
-      router.replace('/login?unauthorized=1');
+      router.replace('/login');
     }
   }, [loading, user, router]);
 
@@ -30,13 +39,23 @@ export function Protected({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative">
-      <AppSidebar expanded={sidebarExpanded} setExpanded={setSidebarExpanded} />
-      <div className="flex-1 flex flex-col pl-8">
-        {redirected && (
-          <div className="fixed top-4 left-1/2 -translate-x-1/2 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded shadow z-50">
-            Você foi redirecionado para o login por falta de autorização.
-          </div>
-        )}
+      <AppSidebar
+        expanded={sidebarExpanded}
+        setExpanded={setSidebarExpanded}
+        visible={sidebarVisible}
+        onClose={() => setSidebarVisible(false)}
+      />
+      {sidebarVisible && (
+        <div
+          className="fixed inset-0 bg-black/30 z-30 sm:hidden"
+          onClick={() => setSidebarVisible(false)}
+        />
+      )}
+      <div
+        className={`flex-1 flex flex-col ${
+          sidebarVisible ? '' : 'sm:pl-8'
+        } transition-all duration-300`}
+      >
         {children}
       </div>
     </div>

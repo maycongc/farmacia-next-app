@@ -5,18 +5,25 @@ import React from 'react';
 import { Protected } from '@/components/layout/Protected';
 import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
+import { FloatingActionsMenu } from '@/components/table/FloatingActionsMenu';
 import { Pagination } from '@/components/table/Pagination';
 import { Button } from '@/design-system/components/Button';
 import { Dialog, DialogContent } from '@/design-system/components/Dialog';
-import { ToastRoot, Toast } from '@/design-system/feedback/Toast';
+import { Toast, ToastRoot } from '@/design-system/feedback/Toast';
 import { queryClient } from '@/lib/react-query/queryClient';
 import {
   deleteLaboratoriosEmLote,
   listLaboratorios,
 } from '@/services/laboratorioService';
 import { formatDateTime } from '@/utils/formatters';
+import { PERMISSOES } from '@/utils/permissions';
 
 export default function LaboratoriosPage() {
+  const { selected, clear, loadingExclusao, setLoadingExclusao } =
+    require('@/context/SelectionContext').useSelection();
+  const selectedRows: Array<string | number> = Array.from(selected) as Array<
+    string | number
+  >;
   const [pagination, setPagination] = React.useState({ page: 0, pageSize: 10 });
   const [idsParaExcluir, setIdsParaExcluir] = React.useState<
     Array<string | number>
@@ -49,7 +56,7 @@ export default function LaboratoriosPage() {
 
   function confirmarExclusao() {
     const numberIds = idsParaExcluir.map(id => Number(id));
-
+    setLoadingExclusao(true);
     deleteLaboratoriosEmLote(numberIds)
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['laboratorios'] });
@@ -95,6 +102,7 @@ export default function LaboratoriosPage() {
         });
       })
       .finally(() => {
+        setLoadingExclusao(false);
         setModalAberto(false);
         setIdsParaExcluir([]);
       });
@@ -113,6 +121,28 @@ export default function LaboratoriosPage() {
         />
       </ToastRoot>
 
+      {selectedRows.length > 0 && (
+        <FloatingActionsMenu
+          selectedCount={selectedRows.length}
+          actions={[
+            {
+              label: 'Editar',
+              onClick: () => handleEditar(selectedRows),
+              type: 'edit',
+              permission: PERMISSOES.LABORATORIO_UPDATE,
+            },
+            {
+              label: 'Excluir',
+              onClick: () => handleExcluir(selectedRows),
+              type: 'delete',
+              permission: PERMISSOES.LABORATORIO_DELETE,
+            },
+          ]}
+          onClear={clear}
+          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-2 sm:static sm:max-w-none sm:px-0"
+        />
+      )}
+
       <Dialog open={modalAberto} onOpenChange={setModalAberto}>
         <DialogContent>
           <DialogPrimitive.Title asChild>
@@ -123,19 +153,35 @@ export default function LaboratoriosPage() {
             Essa ação não pode ser desfeita.
           </p>
           <div className="flex gap-2 justify-end">
-            <Button intent="ghost" onClick={() => setModalAberto(false)}>
+            <Button
+              intent="ghost"
+              onClick={() => setModalAberto(false)}
+              disabled={loadingExclusao}
+            >
               Cancelar
             </Button>
-            <Button intent="danger" onClick={confirmarExclusao}>
-              Excluir
+            <Button
+              intent="danger"
+              onClick={confirmarExclusao}
+              disabled={loadingExclusao}
+            >
+              {loadingExclusao ? (
+                <span className="flex items-center gap-2">
+                  <span>Excluindo</span>
+                  {/* @ts-ignore */}
+                  {require('@/design-system/feedback/Loader').Loader()}
+                </span>
+              ) : (
+                'Excluir'
+              )}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      <div className="flex items-center mb-4">
+      <div className="flex items-center mb-4 gap-4">
         <h2 className="text-xl font-semibold">Laboratórios</h2>
-        <Button intent="outline" size="sm" className="ml-auto">
+        <Button intent="outline" size="sm" className="ml-auto w-full sm:w-auto">
           Novo
         </Button>
       </div>
@@ -146,7 +192,7 @@ export default function LaboratoriosPage() {
             <DataTableSkeleton columns={7} rows={pagination.pageSize} />
           </div>
         ) : (
-          <div className="transition-opacity duration-500 opacity-100">
+          <div className="transition-opacity duration-500 opacity-100 overflow-x-auto">
             <DataTable
               rows={rows}
               keyExtractor={r => r.id}
@@ -166,10 +212,7 @@ export default function LaboratoriosPage() {
                 },
               ]}
               selectable={true}
-              actions={[
-                { label: 'Editar', onClick: handleEditar },
-                { label: 'Excluir', onClick: handleExcluir },
-              ]}
+              className="min-w-[600px] sm:min-w-full"
             />
           </div>
         )}
@@ -179,6 +222,7 @@ export default function LaboratoriosPage() {
         totalItems={data?.totalElements ?? 0}
         onChange={setPagination}
         initialPageSize={pagination.pageSize}
+        className="w-full flex-1 justify-center mt-4"
       />
     </Protected>
   );

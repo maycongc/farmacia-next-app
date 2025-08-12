@@ -2,6 +2,7 @@ import { info } from 'console';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 import { X } from 'lucide-react';
 import React from 'react';
+import { EllipsisTooltip } from '../components/EllipsisTooltip';
 
 export function ToastRoot({ children }: { children: React.ReactNode }) {
   return (
@@ -40,7 +41,7 @@ export function Toast({
     <ToastPrimitive.Root
       open={open}
       onOpenChange={isError ? undefined : onOpenChange}
-      className={`relative rounded-xl px-5 py-3 shadow-sm min-w-[340px] max-w-[95vw] ${colorMap[type]} data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out`}
+      className={`relative rounded-xl px-5 py-3 shadow-sm min-w-[180px] w-full max-w-[95vw] max-h-[320px] overflow-y-auto ${colorMap[type]} data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out`}
       duration={isError ? undefined : 30000}
     >
       <ToastPrimitive.Title className="font-medium text-base mb-2">
@@ -59,15 +60,20 @@ export function Toast({
         </ul>
       )}
       {isError && (
-        <button
-          type="button"
-          className="absolute -top-2 -right-2 flex items-center justify-center size-7 bg-red-900/80 text-white hover:bg-red-800/90 dark:bg-red-900 dark:hover:bg-red-800 p-0.5 rounded-full border border-red-900 dark:border-red-700 shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-900/40"
-          style={{ position: 'absolute' }}
-          onClick={() => onOpenChange(false)}
-          aria-label="Fechar"
+        <EllipsisTooltip
+          tooltip="Fechar"
+          className="absolute top-2 right-2 flex items-center justify-center size-7"
         >
-          <X size={16} strokeWidth={2.2} />
-        </button>
+          <button
+            type="button"
+            className="absolute flex items-center justify-center size-7 bg-red-900/80 text-white hover:bg-red-800/90 dark:bg-red-900 dark:hover:bg-red-800 p-0.5 rounded-full border border-red-900 dark:border-red-700 shadow-sm transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-red-900/40"
+            style={{ position: 'absolute' }}
+            onClick={() => onOpenChange(false)}
+            aria-label="Fechar"
+          >
+            <X size={16} strokeWidth={2.2} />
+          </button>
+        </EllipsisTooltip>
       )}
     </ToastPrimitive.Root>
   );

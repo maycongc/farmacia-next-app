@@ -1,7 +1,8 @@
 import { clsx } from 'clsx';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { FloatingActionsMenu } from '@/components/table/FloatingActionsMenu';
+import { useSelection } from '@/context/SelectionContext';
 import CustomCheckbox from '@/design-system/components/CustomCheckbox';
 import { EllipsisTooltip } from '@/design-system/components/EllipsisTooltip';
 
@@ -11,19 +12,13 @@ interface Column<T> {
   className?: string;
 }
 
-interface DataTableAction {
-  label: string;
-  onClick: (selectedIds: Array<string | number>) => void;
-  color?: string;
-}
-
 interface DataTableProps<T> {
   rows: T[];
   columns: Column<T>[];
   keyExtractor: (row: T) => string | number;
   emptyMessage?: string;
   selectable?: boolean;
-  actions?: DataTableAction[];
+  className?: string;
 }
 
 export function DataTable<T>({
@@ -32,62 +27,36 @@ export function DataTable<T>({
   keyExtractor,
   emptyMessage = 'Sem registros',
   selectable = false,
-  actions,
+  className = '',
 }: DataTableProps<T>) {
-  const [selectedRows, setSelectedRows] = useState<Array<string | number>>([]);
+  const { selected, select, deselect, clear, isSelected, selectMany } =
+    useSelection();
+  const selectedRows = Array.from(selected);
 
   const isAllSelected = rows.length > 0 && selectedRows.length === rows.length;
 
   function handleSelectRow(id: string | number) {
-    setSelectedRows(prev => {
-      const exists = prev.includes(id);
-      const updated = exists ? prev.filter(rid => rid !== id) : [...prev, id];
-      return updated;
-    });
+    if (isSelected(id)) {
+      deselect(id);
+    } else {
+      select(id);
+    }
   }
 
   function handleSelectAll() {
     if (isAllSelected) {
-      setSelectedRows([]);
+      rows.forEach(row => deselect(keyExtractor(row)));
     } else {
-      const allIds = rows.map(keyExtractor);
-      setSelectedRows(allIds);
+      selectMany(rows.map(keyExtractor));
     }
   }
 
   return (
     <>
-      {selectable && selectedRows.length > 0 && (
-        <FloatingActionsMenu
-          selectedCount={selectedRows.length}
-          actions={
-            actions?.map(action => {
-              let defaultColor;
-              switch (action.label.toLowerCase()) {
-                case 'editar':
-                  defaultColor = 'bg-blue-100 text-blue-700 hover:bg-blue-200';
-                  break;
-                case 'excluir':
-                  defaultColor = 'bg-red-100 text-red-700 hover:bg-red-200';
-                  break;
-                default:
-                  defaultColor = action.color || '';
-              }
-              return {
-                ...action,
-                color: action.color || defaultColor,
-                onClick: () => action.onClick(selectedRows),
-              };
-            }) ?? []
-          }
-          onClear={() => setSelectedRows([])}
-        />
-      )}
-      {/* ...existing code... */}
       <div className="w-full max-w-full overflow-x-auto overflow-y-auto border border-[hsl(var(--color-border))] rounded-lg max-h-[60vh] relative">
-        <table className="w-full min-w-max text-sm">
+        <table className={`w-full min-w-max text-sm ${className}`}>
           <thead className="bg-[hsl(var(--color-bg-alt))] sticky top-0 z-10">
-            <tr>
+            <tr style={{ height: '42.5px', maxHeight: '42.5px' }}>
               {selectable && (
                 <th className="px-3 py-2 w-10">
                   <div className="flex items-center justify-center h-full min-h-[26px]">
@@ -103,7 +72,7 @@ export function DataTable<T>({
                 <th
                   key={i}
                   className={clsx(
-                    'px-3 py-2 text-left font-medium truncate',
+                    'px-3 py-1.5 text-left font-medium truncate',
                     c.className,
                     c.header.toLowerCase() === 'id'
                       ? 'max-w-[64px] w-[64px]'
@@ -155,9 +124,10 @@ export function DataTable<T>({
                     'dark:hover:bg-gray-800/60',
                     isSelected && 'bg-blue-100 dark:bg-gray-700',
                   )}
+                  style={{ maxHeight: '36.5px', height: '36.5px' }}
                 >
                   {selectable && (
-                    <td className="px-3 py-2 w-10">
+                    <td className="px-3 w-10">
                       <div className="flex items-center justify-center h-full min-h-[26px]">
                         <CustomCheckbox
                           checked={isSelected}
@@ -172,7 +142,7 @@ export function DataTable<T>({
                       <td
                         key={i}
                         className={clsx(
-                          'px-3 py-2 truncate',
+                          'px-3 py-1.5 truncate',
                           c.className,
                           c.header.toLowerCase() === 'id'
                             ? 'max-w-[64px] w-[64px]'

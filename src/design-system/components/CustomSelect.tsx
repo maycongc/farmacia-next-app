@@ -1,4 +1,5 @@
 'use client';
+import { ChevronDown } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 
 export interface CustomSelectProps {
@@ -77,21 +78,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           aria-expanded={open}
         >
           <span>{selected ? selected.label : 'Selecione...'}</span>
-          <svg
-            width="16"
-            height="16"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="ml-2 text-gray-400"
-          >
-            <path
-              d="M7 10l5 5 5-5"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <ChevronDown size={16} className="ml-2 text-gray-400" />
         </button>
         {visible && (
           <ul
