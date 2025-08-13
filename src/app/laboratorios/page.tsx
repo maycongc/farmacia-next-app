@@ -7,6 +7,7 @@ import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
 import { FloatingActionsMenu } from '@/components/table/FloatingActionsMenu';
 import { Pagination } from '@/components/table/Pagination';
+import { Badge } from '@/design-system/components/Badge';
 import { Button } from '@/design-system/components/Button';
 import { Dialog, DialogContent } from '@/design-system/components/Dialog';
 import { Toast, ToastRoot } from '@/design-system/feedback/Toast';

@@ -15,7 +15,11 @@ export function Badge({ tone = 'neutral', className, ...rest }: BadgeProps) {
 
   return (
     <span
-      className={clsx('px-2 py-0.5 text-xs rounded-md', tones[tone], className)}
+      className={clsx(
+        'w-fit px-2 py-0.5 text-xs rounded-md',
+        tones[tone],
+        className,
+      )}
       {...rest}
     />
   );

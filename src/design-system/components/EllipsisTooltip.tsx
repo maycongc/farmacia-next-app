@@ -14,13 +14,49 @@ export const EllipsisTooltip: React.FC<EllipsisTooltipProps> = props => {
   const [coords, setCoords] = useState<{ x: number; y: number } | null>(null);
   const [visible, setVisible] = useState(false);
 
+  // Fecha tooltip ao clicar fora ou ao scroll
+  useEffect(() => {
+    if (!showTooltip) return;
+    function handleClose(e: Event) {
+      setShowTooltip(false);
+    }
+
+    window.addEventListener('scroll', handleClose, true);
+    window.addEventListener('mousedown', handleClose);
+    window.addEventListener('touchstart', handleClose);
+
+    return () => {
+      window.removeEventListener('scroll', handleClose, true);
+      window.removeEventListener('mousedown', handleClose);
+      window.removeEventListener('touchstart', handleClose);
+    };
+  }, [showTooltip]);
+
+  // Fecha tooltip ao clicar fora ou ao scroll
+  useEffect(() => {
+    if (!showTooltip) return;
+
+    function handleClose(e: Event) {
+      setShowTooltip(false);
+    }
+
+    window.addEventListener('scroll', handleClose, true);
+    window.addEventListener('mousedown', handleClose);
+    window.addEventListener('touchstart', handleClose);
+
+    return () => {
+      window.removeEventListener('scroll', handleClose, true);
+      window.removeEventListener('mousedown', handleClose);
+      window.removeEventListener('touchstart', handleClose);
+    };
+  }, [showTooltip]);
+
   useEffect(() => {
     if (showTooltip && textRef.current) {
       const rect = textRef.current.getBoundingClientRect();
       setCoords({ x: rect.left + rect.width / 2, y: rect.bottom });
       setVisible(true);
     } else if (visible) {
-      // Aguarda a animação de fade-out antes de remover do DOM
       const timeout = setTimeout(() => setVisible(false), 180);
       return () => clearTimeout(timeout);
     } else {
@@ -51,7 +87,7 @@ export const EllipsisTooltip: React.FC<EllipsisTooltipProps> = props => {
             }`}
             style={{
               left: coords.x,
-              top: coords.y + 6,
+              top: coords.y + 5,
               transform: 'translateX(-50%)',
               pointerEvents: 'none',
               zIndex: 100,

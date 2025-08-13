@@ -46,12 +46,12 @@ export function FloatingActionsMenu({
         maxWidth: '95vw',
         minWidth: 'min(220px, 95vw)',
       }}
-      className={`relative flex items-center px-3 sm:px-6 py-1.5 sm:py-2 rounded-lg bg-white dark:bg-gray-900 shadow-lg border h-fit border-[hsl(var(--color-border))] ${className}`}
+      className={`relative flex items-center pl-4 pr-6 sm:pr-7 sm:pl-5 py-1.5 sm:py-2 rounded-lg bg-white dark:bg-gray-900 shadow-lg border h-fit border-[hsl(var(--color-border))] ${className}`}
     >
       <span className="text-[15px] sm:text-sm mr-3 sm:mr-6 whitespace-nowrap">
         {selectedCount} selecionado(s)
       </span>
-      <div className="flex gap-2 sm:gap-4">
+      <div className="flex gap-3 sm:gap-5">
         {actions
           .filter(
             action =>

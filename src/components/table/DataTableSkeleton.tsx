@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface DataTableSkeletonProps {
   columns: number;
   rows: number;
@@ -12,22 +10,27 @@ export function DataTableSkeleton({ columns, rows }: DataTableSkeletonProps) {
         <thead className="bg-[hsl(var(--color-bg-alt))] sticky top-0 z-10">
           <tr style={{ height: '42.5px', maxHeight: '42.5px' }}>
             {/* Coluna de seleção */}
-            <th className="px-3 py-2 w-10 max-w-[64px]">
+            <th className="px-2 w-10 max-w-[64px]">
               <div className="flex items-center justify-center h-full min-h-[26px]">
-                <div className="h-4 w-4 rounded bg-gray-400 dark:bg-gray-700" />
+                <div className="h-4 w-5 rounded bg-gray-400 dark:bg-gray-700" />
               </div>
             </th>
+
             {Array.from({ length: columns }).map((_, i) => (
               <th
                 key={i}
                 className={`${
                   i === 0 ? 'max-w-[64px] w-[64px]' : 'max-w-[180px] px-3'
                 }`}
-                style={
-                  i === 0 ? { maxWidth: 64, width: 64 } : { maxWidth: 180 }
-                }
               >
-                <div className="h-4 w-full rounded bg-gray-400 dark:bg-gray-700" />
+                <div
+                  className="h-4 rounded bg-gray-400 dark:bg-gray-700"
+                  style={{
+                    width: i === 0 ? '70%' : `min(120px, 100%)`,
+                    minWidth: i === 0 ? '40px' : '80px',
+                    margin: '0 auto',
+                  }}
+                />
               </th>
             ))}
           </tr>
@@ -36,11 +39,12 @@ export function DataTableSkeleton({ columns, rows }: DataTableSkeletonProps) {
           {Array.from({ length: rows }).map((_, r) => (
             <tr key={r} style={{ height: '36.5px', maxHeight: '36.5px' }}>
               {/* Coluna de seleção */}
-              <td className="w-10 max-w-[64px]">
+              <td className="px-2 w-10 max-w-[64px]">
                 <div className="flex items-center justify-center h-full min-h-[26px]">
-                  <div className="h-4 w-4 rounded bg-gray-300 dark:bg-gray-800" />
+                  <div className="h-4 w-5 rounded bg-gray-300 dark:bg-gray-800" />
                 </div>
               </td>
+
               {Array.from({ length: columns }).map((_, c) => (
                 <td
                   key={c}
@@ -51,7 +55,14 @@ export function DataTableSkeleton({ columns, rows }: DataTableSkeletonProps) {
                     c === 0 ? { maxWidth: 64, width: 64 } : { maxWidth: 180 }
                   }
                 >
-                  <div className="h-4 w-full rounded bg-gray-300 dark:bg-gray-800" />
+                  <div
+                    className="h-4 rounded bg-gray-300 dark:bg-gray-800"
+                    style={{
+                      width: c === 0 ? '70%' : `min(120px, 100%)`,
+                      minWidth: c === 0 ? '40px' : '80px',
+                      margin: '0 auto',
+                    }}
+                  />
                 </td>
               ))}
             </tr>

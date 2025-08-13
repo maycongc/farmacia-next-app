@@ -36,14 +36,16 @@ export function AppHeader() {
         <ThemeToggleButton />
         {user && (
           <>
-            <span className="text-sm opacity-80">{user.nome}</span>
+            <span className="text-sm opacity-80 hidden sm:inline">
+              {user.nome}
+            </span>
             <EllipsisTooltip tooltip="Deslogar">
               <Button
                 intent="ghost"
                 size="sm"
                 onClick={logout}
                 aria-label="Sair"
-                className="p-2"
+                className="p-2 hidden sm:inline-flex"
               >
                 <LogOut size={20} />
               </Button>
