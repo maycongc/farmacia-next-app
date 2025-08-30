@@ -1,7 +1,6 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { Protected } from '@/components/layout/Protected';
 import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
 import { Pagination } from '@/components/table/Pagination';
@@ -17,7 +16,7 @@ export default function RemediosPage() {
 
   const rows: any[] = data?.content || [];
   return (
-    <Protected>
+    <>
       <h2 className="text-xl font-semibold mb-4">Remédios</h2>
       <div className="min-h-fit">
         {isLoading ? (
@@ -54,6 +53,6 @@ export default function RemediosPage() {
         onChange={setPagination}
         initialPageSize={pagination.pageSize}
       />
-    </Protected>
+    </>
   );
 }

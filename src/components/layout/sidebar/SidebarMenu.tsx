@@ -6,8 +6,7 @@ interface SidebarMenuProps {
   user: any;
   openSubmenu: string | null;
   setOpenSubmenu: (label: string | null) => void;
-  onClose?: () => void;
-  expanded: boolean;
+  onClose: () => void;
 }
 
 export function SidebarMenu({
@@ -16,7 +15,6 @@ export function SidebarMenu({
   openSubmenu,
   setOpenSubmenu,
   onClose,
-  expanded,
 }: SidebarMenuProps) {
   return (
     <nav className="flex flex-col gap-1 px-0 py-4 mt-0 overflow-y-auto w-full h-full max-h-full">
@@ -28,7 +26,6 @@ export function SidebarMenu({
           openSubmenu={openSubmenu}
           setOpenSubmenu={setOpenSubmenu}
           onClose={onClose}
-          expanded={expanded}
         />
       ))}
     </nav>

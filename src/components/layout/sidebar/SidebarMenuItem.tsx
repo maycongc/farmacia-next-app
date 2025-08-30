@@ -9,7 +9,6 @@ interface SidebarMenuItemProps {
   openSubmenu: string | null;
   setOpenSubmenu: (label: string | null) => void;
   onClose?: () => void;
-  expanded: boolean;
 }
 
 export function SidebarMenuItem({
@@ -18,7 +17,6 @@ export function SidebarMenuItem({
   openSubmenu,
   setOpenSubmenu,
   onClose,
-  expanded,
 }: SidebarMenuItemProps) {
   if (item.permission && !hasPermission(user ?? {}, item.permission)) {
     return null;
@@ -49,12 +47,7 @@ export function SidebarMenuItem({
             <Icon size={24} />
           </span>
         )}
-        <span
-          className={`truncate ml-2 ${
-            expanded ? 'inline' : 'inline sm:inline'
-          }`}
-          style={{ minWidth: 0 }}
-        >
+        <span className={`truncate ml-2 inline`} style={{ minWidth: 0 }}>
           {item.label}
         </span>
       </button>

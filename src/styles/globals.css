@@ -12,9 +12,9 @@
   --brand-500: 210 85% 45%;
   --brand-600: 210 85% 38%;
   --brand-700: 210 90% 30%;
-  --color-bg: 0 0% 100%;
-  --color-bg-alt: 210 40% 98%;
-  --color-bg-alt-dark: 210 32% 92%;
+  --color-bg: 0 0% 95%;
+  --color-bg-alt: 210 40% 93%;
+  --color-bg-alt-dark: 210 32% 90%;
   --color-border: 210 16% 85%;
   --color-fg: 222 47% 11%;
   --radius-base: 8px;
@@ -82,5 +82,38 @@ body {
 @keyframes fadeOut {
   to {
     opacity: 0;
+  }
+}
+
+.radix-themes {
+  --cursor-disabled: default;
+
+  --cursor-button: pointer;
+  --cursor-checkbox: pointer;
+  --cursor-link: pointer;
+  --cursor-menu-item: pointer;
+  --cursor-radio: pointer;
+  --cursor-switch: pointer;
+
+  --cursor-slider-thumb: grab;
+  --cursor-slider-thumb-active: grabbing;
+}
+
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+  display: none !important;
+}
+
+input:-moz-focusring {
+  outline: none;
+}
+
+@media (min-width: 1024px) {
+  .gridSystemInfo > div:first-child {
+    grid-column: span 2;
+  }
+
+  .gridSystemInfo > div:last-child {
+    grid-column: span 1;
   }
 }

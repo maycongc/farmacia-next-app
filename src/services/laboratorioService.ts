@@ -1,11 +1,11 @@
-import { PageResponse } from '@/domain/dto/common';
-import {
-  LaboratorioRequest,
-  LaboratorioUpdateRequest,
-  LaboratorioResponse,
-} from '@/domain/dto/laboratorio';
 import { api } from '@/lib/api/axios';
 import { endpoints } from '@/lib/api/endpoints';
+import { PageResponse } from '@/types/common';
+import {
+  LaboratorioRequest,
+  LaboratorioResponse,
+  LaboratorioUpdateRequest,
+} from '@/types/laboratorio';
 
 export function listLaboratorios(
   page = 0,

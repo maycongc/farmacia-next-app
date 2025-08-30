@@ -1,5 +1,5 @@
-import { PageResponse } from '@/domain/dto/common';
-import { RemedioRequest, RemedioResponse } from '@/domain/dto/remedio';
+import { PageResponse } from '@/types/common';
+import { RemedioRequest, RemedioResponse } from '@/types/remedio';
 import { api } from '@/lib/api/axios';
 import { endpoints } from '@/lib/api/endpoints';
 

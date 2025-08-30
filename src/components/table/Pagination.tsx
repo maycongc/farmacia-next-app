@@ -75,12 +75,17 @@ export function Pagination({
     <div className={`w-full mt-4 ${className}`}>
       <div className="mb-4 ml-2 w-full text-left">
         <span className="text-xs text-gray-700 dark:text-gray-100 max-w-full font-medium truncate whitespace-nowrap block">
-          Página <span className="font-bold text-blue-600">{page + 1}</span> de{' '}
-          <span className="font-bold">{totalPages}</span> &mdash; Exibindo{' '}
-          <span className="font-bold">{Math.min(pageSize, totalItems)}</span> de{' '}
-          <span className="font-bold">{totalItems}</span> registros
+          <span className="font-bold text-blue-500">
+            {Math.min(pageSize * page + 1, totalItems)}
+          </span>
+          {' ao '}
+          <span className="font-bold text-blue-500">
+            {Math.min(pageSize * (page + 1), totalItems)}
+          </span>
+          {` de ${totalItems} registros`}
         </span>
       </div>
+
       <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 w-full">
         <div className="flex flex-row flex-wrap items-center gap-1 w-full sm:w-auto justify-center">
           <Button

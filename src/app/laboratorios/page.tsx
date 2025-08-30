@@ -1,15 +1,14 @@
 'use client';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Dialog } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
-import { Protected } from '@/components/layout/Protected';
 import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
 import { FloatingActionsMenu } from '@/components/table/FloatingActionsMenu';
 import { Pagination } from '@/components/table/Pagination';
-import { Badge } from '@/design-system/components/Badge';
 import { Button } from '@/design-system/components/Button';
-import { Dialog, DialogContent } from '@/design-system/components/Dialog';
+import { DialogContent } from '@/design-system/components/dialog/Dialog';
+import { Loader } from '@/design-system/feedback/Loader';
 import { Toast, ToastRoot } from '@/design-system/feedback/Toast';
 import { queryClient } from '@/lib/react-query/queryClient';
 import {
@@ -110,7 +109,7 @@ export default function LaboratoriosPage() {
   }
 
   return (
-    <Protected>
+    <>
       <ToastRoot>
         <Toast
           open={toast.open}
@@ -144,11 +143,15 @@ export default function LaboratoriosPage() {
         />
       )}
 
-      <Dialog open={modalAberto} onOpenChange={setModalAberto}>
+      <Dialog.Root open={modalAberto} onOpenChange={setModalAberto}>
         <DialogContent>
-          <DialogPrimitive.Title asChild>
-            <h3 className="text-lg font-semibold mb-2">Confirmar exclusão</h3>
-          </DialogPrimitive.Title>
+          <Dialog.Title
+            size={{ initial: '4', xs: '5', sm: '6' }}
+            weight={'medium'}
+          >
+            Confirmar exclusão
+          </Dialog.Title>
+
           <p className="mb-4">
             Deseja realmente excluir {idsParaExcluir.length} laboratório(s)?
             Essa ação não pode ser desfeita.
@@ -169,8 +172,7 @@ export default function LaboratoriosPage() {
               {loadingExclusao ? (
                 <span className="flex items-center gap-2">
                   <span>Excluindo</span>
-                  {/* @ts-ignore */}
-                  {require('@/design-system/feedback/Loader').Loader()}
+                  <Loader size="1" />
                 </span>
               ) : (
                 'Excluir'
@@ -178,7 +180,7 @@ export default function LaboratoriosPage() {
             </Button>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog.Root>
 
       <div className="flex items-center mb-4 gap-4">
         <h2 className="text-xl font-semibold">Laboratórios</h2>
@@ -225,6 +227,6 @@ export default function LaboratoriosPage() {
         initialPageSize={pagination.pageSize}
         className="w-full flex-1 justify-center mt-4"
       />
-    </Protected>
+    </>
   );
 }

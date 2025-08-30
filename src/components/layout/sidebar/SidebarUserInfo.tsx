@@ -3,13 +3,18 @@ import { EllipsisTooltip } from '@/design-system/components/EllipsisTooltip';
 import { useAuth } from '@/hooks/useAuth';
 interface SidebarUserInfoProps {
   user: any;
+  expanded: boolean;
 }
 
-export function SidebarUserInfo({ user }: SidebarUserInfoProps) {
+export function SidebarUserInfo({ user, expanded }: SidebarUserInfoProps) {
   const { logout } = useAuth();
   if (!user) return null;
   return (
-    <div className="w-full flex items-center gap-3 px-4 py-3 mb-3 bg-[hsl(var(--color-bg-alt)/0.97)] dark:bg-[hsl(var(--color-bg)/0.7)] border border-transparent shadow-sm">
+    <div
+      className={`w-full flex items-center gap-3 px-4 py-3 mb-3 bg-[hsl(var(--color-bg-alt)/0.97)] dark:bg-[hsl(var(--color-bg)/0.7)] border border-transparent shadow-sm ${
+        !expanded && 'hidden'
+      }`}
+    >
       <div className="flex items-center justify-center w-8 h-8 rounded-full bg-[hsl(var(--color-bg)/0.2)]">
         <User size={20} className="text-brand-500 dark:text-brand-300" />
       </div>

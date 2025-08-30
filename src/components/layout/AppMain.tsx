@@ -1,10 +1,25 @@
-export function AppMain({ children }: { children: React.ReactNode }) {
+'use client';
+import { Box, ScrollArea } from '@radix-ui/themes';
+
+export function AppMain({
+  children,
+  isPublicRoute,
+}: {
+  children: React.ReactNode;
+  isPublicRoute: () => boolean;
+}) {
   return (
-    <main
-      className="flex-1 h-[calc(100vh-65px)] overflow-auto px-2 sm:px-6 py-6 w-auto max-w-full"
-      style={{ minHeight: 0 }}
+    <ScrollArea
+      id="corpo"
+      type="hover"
+      scrollbars="both"
+      className={`max-h-[calc(100dvh-64px)] bg-[hsl(var(--color-bg-alt))] transition-all duration-200 ml-0 ${
+        !isPublicRoute() && 'ml-0 sm:ml-[40px] sm:max-w-[calc(100%-40px)]'
+      }`}
     >
-      {children}
-    </main>
+      <Box className="table table-fixed w-full max-w-full box-border px-[0.7rem] xs:px-[1rem] sm:px-[1.3rem] py-[1rem]">
+        {children}
+      </Box>
+    </ScrollArea>
   );
 }

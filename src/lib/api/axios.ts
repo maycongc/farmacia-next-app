@@ -10,56 +10,107 @@ declare module 'axios' {
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
   withCredentials: true,
 });
 
-api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = getAccessToken();
+// Flag para evitar loops infinitos no refresh
+let isRefreshing = false;
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}> = [];
 
-  if (token) {
-    config.headers = config.headers ?? {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token!);
+    }
+  });
 
-  return config;
-});
+  failedQueue = [];
+};
 
-let refreshing = false;
-let waitQueue: Array<() => void> = [];
+// Request interceptor - adiciona token de autorização
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = sessionStorage.getItem('accessToken');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  },
+);
 
+// Response interceptor - trata refresh token automaticamente
 api.interceptors.response.use(
-  r => r,
+  response => response,
   async (error: AxiosError) => {
-    const status = error.response?.status;
-    const original = error.config as InternalAxiosRequestConfig;
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+    };
 
-    if (status === 401 && original && !original._retry) {
-      if (refreshing) {
-        await new Promise<void>(res => waitQueue.push(res));
-      } else {
-        refreshing = true;
-
-        try {
-          const resp = await api.post(endpoints.auth.refresh);
-          // @ts-ignore
-          setAccessToken(resp.data.accessToken);
-        } catch {
-          clearTokens();
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login?unauthorized=1';
-          }
-          return Promise.reject(error);
-        } finally {
-          refreshing = false;
-          waitQueue.forEach(fn => fn());
-          waitQueue = [];
-        }
-      }
-
-      original._retry = true;
-      return api(original);
+    // Se o erro não é 401 ou já tentamos fazer refresh, rejeita
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    // Se já está fazendo refresh, adiciona à fila
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        failedQueue.push({ resolve, reject });
+      })
+        .then(token => {
+          if (originalRequest.headers) {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+          }
+          return api(originalRequest);
+        })
+        .catch(err => {
+          return Promise.reject(err);
+        });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      // Tenta fazer refresh do token
+      const response = await api.post(endpoints.auth.refresh);
+      const { accessToken } = response.data;
+
+      // Salva novo token
+      sessionStorage.setItem('accessToken', accessToken);
+
+      // Processa fila de requisições pendentes
+      processQueue(null, accessToken);
+
+      // Reexecuta requisição original
+      if (originalRequest.headers) {
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      }
+      return api(originalRequest);
+    } catch (refreshError) {
+      // Se refresh falha, limpa dados e redireciona para login
+      processQueue(refreshError, null);
+      sessionStorage.removeItem('accessToken');
+
+      // Só redireciona se estiver no client-side
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login?unauthorized=1';
+      }
+
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   },
 );
