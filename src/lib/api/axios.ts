@@ -1,6 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { endpoints } from './endpoints';
-import { getAccessToken, setAccessToken, clearTokens } from '@/utils/authToken';
 
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
@@ -8,11 +7,24 @@ declare module 'axios' {
   }
 }
 
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+export const HEADER_SKIP_AUTH_REFRESH = 'X-Skip-Auth-Refresh';
+export const HEADER_CONTENT_TYPE = 'Content-Type';
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: API_BASE_URL,
   timeout: 30000,
   headers: {
-    'Content-Type': 'application/json',
+    [HEADER_CONTENT_TYPE]: 'application/json',
+  },
+  withCredentials: true,
+});
+
+export const authApi = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+  headers: {
+    [HEADER_CONTENT_TYPE]: 'application/json',
   },
   withCredentials: true,
 });
@@ -40,9 +52,26 @@ const processQueue = (error: any, token: string | null = null) => {
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = sessionStorage.getItem('accessToken');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  },
+);
+
+authApi.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = sessionStorage.getItem('accessToken');
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   error => {
@@ -58,8 +87,21 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    const isAuthRoute =
+      typeof originalRequest.url === 'string' &&
+      (originalRequest?.url.includes(endpoints.auth.refresh) ||
+        originalRequest?.url.includes(endpoints.auth.logout));
+
+    const skip =
+      originalRequest?.headers?.[HEADER_SKIP_AUTH_REFRESH] === 'true';
+
     // Se o erro não é 401 ou já tentamos fazer refresh, rejeita
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    if (
+      error.response?.status !== 401 ||
+      originalRequest._retry ||
+      isAuthRoute ||
+      skip
+    ) {
       return Promise.reject(error);
     }
 
@@ -84,11 +126,18 @@ api.interceptors.response.use(
 
     try {
       // Tenta fazer refresh do token
-      const response = await api.post(endpoints.auth.refresh);
+      const response = await authApi.post(
+        endpoints.auth.refresh,
+        {},
+        { headers: { [HEADER_SKIP_AUTH_REFRESH]: 'true' } },
+      );
+
       const { accessToken } = response.data;
 
-      // Salva novo token
-      sessionStorage.setItem('accessToken', accessToken);
+      if (accessToken) {
+        // Salva novo token
+        sessionStorage.setItem('accessToken', accessToken);
+      }
 
       // Processa fila de requisições pendentes
       processQueue(null, accessToken);
@@ -102,12 +151,6 @@ api.interceptors.response.use(
       // Se refresh falha, limpa dados e redireciona para login
       processQueue(refreshError, null);
       sessionStorage.removeItem('accessToken');
-
-      // Só redireciona se estiver no client-side
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login?unauthorized=1';
-      }
-
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

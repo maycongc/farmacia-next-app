@@ -4,6 +4,7 @@ export const endpoints = {
     login: '/auth/login',
     refresh: '/auth/refresh',
     me: '/auth/me',
+    logout: '/auth/logout',
   },
   usuarios: '/usuarios',
   laboratorios: '/laboratorios',

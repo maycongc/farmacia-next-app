@@ -12,7 +12,9 @@ import {
   TextField,
 } from '@radix-ui/themes';
 import {
+  ALargeSmallIcon,
   Calendar1Icon,
+  IdCardIcon,
   LockIcon,
   MailIcon,
   UserIcon,
@@ -39,7 +41,7 @@ export default function SignupForm({
   const [erro, setErro] = useState<ValidationErroProps | null>(null);
 
   const { register } = useAuth();
-  const { replace } = useRouter();
+  const router = useRouter();
 
   async function handleSignUp(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -73,7 +75,7 @@ export default function SignupForm({
       const success = await register(data);
 
       if (success) {
-        replace('/login?registered=1');
+        router.replace('/login?registered=1');
         setOpen(false);
       }
     } catch (error: any) {
@@ -85,7 +87,7 @@ export default function SignupForm({
   }
 
   return (
-    <Flex direction={'column'} gap={'4'} asChild>
+    <Flex direction={'column'} gap={'4'}>
       {alertas.map((alerta, index) => (
         <CalloutMessage
           type="alert"
@@ -109,7 +111,11 @@ export default function SignupForm({
         </CalloutMessage>
       )}
 
-      <form onSubmit={handleSignUp} method="POST">
+      <form
+        onSubmit={handleSignUp}
+        method="POST"
+        className="flex flex-col gap-4"
+      >
         <ScrollArea className="max-h-40dvh">
           <Box className="table table-fixed w-full h-full max-h-[20dvh] box-border">
             <Flex direction={'column'} gap={'4'}>
@@ -126,7 +132,7 @@ export default function SignupForm({
                   name="nome"
                 >
                   <TextField.Slot>
-                    <UserIcon size={20} />
+                    <ALargeSmallIcon size={20} />
                   </TextField.Slot>
                 </DialogTextFieldRoot>
               </Box>
@@ -179,7 +185,7 @@ export default function SignupForm({
                   name="cpf"
                 >
                   <TextField.Slot>
-                    <MailIcon size={20} />
+                    <IdCardIcon size={20} />
                   </TextField.Slot>
                 </DialogTextFieldRoot>
               </Box>

@@ -1,7 +1,10 @@
 'use client';
+
 import { Dialog } from '@radix-ui/themes';
 import { useQuery } from '@tanstack/react-query';
 import React from 'react';
+import MainLayout from '@/components/layout/MainLayout';
+import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
 import { FloatingActionsMenu } from '@/components/table/FloatingActionsMenu';
@@ -40,7 +43,8 @@ export default function LaboratoriosPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['laboratorios', pagination.page, pagination.pageSize],
-    queryFn: () => listLaboratorios(pagination.page, pagination.pageSize),
+    queryFn: async () =>
+      await listLaboratorios(pagination.page, pagination.pageSize),
   });
 
   const rows: any[] = data?.content || [];
@@ -109,124 +113,130 @@ export default function LaboratoriosPage() {
   }
 
   return (
-    <>
-      <ToastRoot>
-        <Toast
-          open={toast.open}
-          onOpenChange={open => setToast(t => ({ ...t, open }))}
-          title={toast.type}
-          description={toast.message}
-          type={toast.type}
-          list={toast.list}
-        />
-      </ToastRoot>
+    <ProtectedRoute>
+      <MainLayout>
+        <ToastRoot>
+          <Toast
+            open={toast.open}
+            onOpenChange={open => setToast(t => ({ ...t, open }))}
+            title={toast.type}
+            description={toast.message}
+            type={toast.type}
+            list={toast.list}
+          />
+        </ToastRoot>
 
-      {selectedRows.length > 0 && (
-        <FloatingActionsMenu
-          selectedCount={selectedRows.length}
-          actions={[
-            {
-              label: 'Editar',
-              onClick: () => handleEditar(selectedRows),
-              type: 'edit',
-              permission: PERMISSOES.LABORATORIO_UPDATE,
-            },
-            {
-              label: 'Excluir',
-              onClick: () => handleExcluir(selectedRows),
-              type: 'delete',
-              permission: PERMISSOES.LABORATORIO_DELETE,
-            },
-          ]}
-          onClear={clear}
-          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-2 sm:static sm:max-w-none sm:px-0"
-        />
-      )}
-
-      <Dialog.Root open={modalAberto} onOpenChange={setModalAberto}>
-        <DialogContent>
-          <Dialog.Title
-            size={{ initial: '4', xs: '5', sm: '6' }}
-            weight={'medium'}
-          >
-            Confirmar exclusão
-          </Dialog.Title>
-
-          <p className="mb-4">
-            Deseja realmente excluir {idsParaExcluir.length} laboratório(s)?
-            Essa ação não pode ser desfeita.
-          </p>
-          <div className="flex gap-2 justify-end">
-            <Button
-              intent="ghost"
-              onClick={() => setModalAberto(false)}
-              disabled={loadingExclusao}
-            >
-              Cancelar
-            </Button>
-            <Button
-              intent="danger"
-              onClick={confirmarExclusao}
-              disabled={loadingExclusao}
-            >
-              {loadingExclusao ? (
-                <span className="flex items-center gap-2">
-                  <span>Excluindo</span>
-                  <Loader size="1" />
-                </span>
-              ) : (
-                'Excluir'
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog.Root>
-
-      <div className="flex items-center mb-4 gap-4">
-        <h2 className="text-xl font-semibold">Laboratórios</h2>
-        <Button intent="outline" size="sm" className="ml-auto w-full sm:w-auto">
-          Novo
-        </Button>
-      </div>
-
-      <div className="min-h-fit">
-        {isLoading ? (
-          <div className="transition-opacity duration-500 opacity-100">
-            <DataTableSkeleton columns={7} rows={pagination.pageSize} />
-          </div>
-        ) : (
-          <div className="transition-opacity duration-500 opacity-100 overflow-x-auto">
-            <DataTable
-              rows={rows}
-              keyExtractor={r => r.id}
-              columns={[
-                { header: 'ID', accessor: r => r.id },
-                { header: 'Nome', accessor: r => r.nome },
-                { header: 'Endereço', accessor: r => r.endereco },
-                { header: 'Telefone', accessor: r => r.telefone },
-                { header: 'Email', accessor: r => r.email },
-                {
-                  header: 'Criado em',
-                  accessor: r => formatDateTime(r.createdAt),
-                },
-                {
-                  header: 'Atualizado em',
-                  accessor: r => formatDateTime(r.updatedAt),
-                },
-              ]}
-              selectable={true}
-              className="min-w-[600px] sm:min-w-full"
-            />
-          </div>
+        {selectedRows.length > 0 && (
+          <FloatingActionsMenu
+            selectedCount={selectedRows.length}
+            actions={[
+              {
+                label: 'Editar',
+                onClick: () => handleEditar(selectedRows),
+                type: 'edit',
+                permission: PERMISSOES.LABORATORIO_UPDATE,
+              },
+              {
+                label: 'Excluir',
+                onClick: () => handleExcluir(selectedRows),
+                type: 'delete',
+                permission: PERMISSOES.LABORATORIO_DELETE,
+              },
+            ]}
+            onClear={clear}
+            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md px-2 sm:static sm:max-w-none sm:px-0"
+          />
         )}
-      </div>
 
-      <Pagination
-        totalItems={data?.totalElements ?? 0}
-        onChange={setPagination}
-        initialPageSize={pagination.pageSize}
-        className="w-full flex-1 justify-center mt-4"
-      />
-    </>
+        <Dialog.Root open={modalAberto} onOpenChange={setModalAberto}>
+          <DialogContent>
+            <Dialog.Title
+              size={{ initial: '4', xs: '5', sm: '6' }}
+              weight={'medium'}
+            >
+              Confirmar exclusão
+            </Dialog.Title>
+
+            <p className="mb-4">
+              Deseja realmente excluir {idsParaExcluir.length} laboratório(s)?
+              Essa ação não pode ser desfeita.
+            </p>
+            <div className="flex gap-2 justify-end">
+              <Button
+                intent="ghost"
+                onClick={() => setModalAberto(false)}
+                disabled={loadingExclusao}
+              >
+                Cancelar
+              </Button>
+              <Button
+                intent="danger"
+                onClick={confirmarExclusao}
+                disabled={loadingExclusao}
+              >
+                {loadingExclusao ? (
+                  <span className="flex items-center gap-2">
+                    <span>Excluindo</span>
+                    <Loader size="1" />
+                  </span>
+                ) : (
+                  'Excluir'
+                )}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog.Root>
+
+        <div className="flex items-center mb-4 gap-4">
+          <h2 className="text-xl font-semibold">Laboratórios</h2>
+          <Button
+            intent="outline"
+            size="sm"
+            className="ml-auto w-full sm:w-auto"
+          >
+            Novo
+          </Button>
+        </div>
+
+        <div className="min-h-fit">
+          {isLoading ? (
+            <div className="transition-opacity duration-500 opacity-100">
+              <DataTableSkeleton columns={7} rows={pagination.pageSize} />
+            </div>
+          ) : (
+            <div className="transition-opacity duration-500 opacity-100 overflow-x-auto">
+              <DataTable
+                rows={rows}
+                keyExtractor={r => r.id}
+                columns={[
+                  { header: 'ID', accessor: r => r.id },
+                  { header: 'Nome', accessor: r => r.nome },
+                  { header: 'Endereço', accessor: r => r.endereco },
+                  { header: 'Telefone', accessor: r => r.telefone },
+                  { header: 'Email', accessor: r => r.email },
+                  {
+                    header: 'Criado em',
+                    accessor: r => formatDateTime(r.createdAt),
+                  },
+                  {
+                    header: 'Atualizado em',
+                    accessor: r => formatDateTime(r.updatedAt),
+                  },
+                ]}
+                selectable={true}
+                className="min-w-[600px] sm:min-w-full"
+              />
+            </div>
+          )}
+        </div>
+
+        <Pagination
+          totalItems={data?.totalElements ?? 0}
+          onChange={setPagination}
+          initialPageSize={pagination.pageSize}
+          className="w-full flex-1 justify-center mt-4"
+        />
+      </MainLayout>
+    </ProtectedRoute>
   );
 }

@@ -1,14 +1,15 @@
-import { User, LogOut } from 'lucide-react';
+import { LogOut, User } from 'lucide-react';
 import { EllipsisTooltip } from '@/design-system/components/EllipsisTooltip';
 import { useAuth } from '@/hooks/useAuth';
 interface SidebarUserInfoProps {
-  user: any;
   expanded: boolean;
 }
 
-export function SidebarUserInfo({ user, expanded }: SidebarUserInfoProps) {
-  const { logout } = useAuth();
+export function SidebarUserInfo({ expanded }: SidebarUserInfoProps) {
+  const { user, logout } = useAuth();
+
   if (!user) return null;
+
   return (
     <div
       className={`w-full flex items-center gap-3 px-4 py-3 mb-3 bg-[hsl(var(--color-bg-alt)/0.97)] dark:bg-[hsl(var(--color-bg)/0.7)] border border-transparent shadow-sm ${

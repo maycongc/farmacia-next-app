@@ -1,21 +1,23 @@
 import Link from 'next/link';
 import type { MenuItem } from '../AppSidebar';
+import { useAuth } from '@/hooks/useAuth';
 import { hasPermission } from '@/utils/permissions';
 
 interface SidebarSubmenuProps {
   item: MenuItem;
-  user: any;
   openSubmenu: string | null;
   setOpenSubmenu: (label: string | null) => void;
 }
 
 export function SidebarSubmenu({
   item,
-  user,
   openSubmenu,
   setOpenSubmenu,
 }: SidebarSubmenuProps) {
+  const { user } = useAuth();
+
   const isOpen = openSubmenu === item.label;
+
   return (
     <div className="w-full flex flex-col items-center">
       <button

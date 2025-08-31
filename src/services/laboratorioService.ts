@@ -7,13 +7,15 @@ import {
   LaboratorioUpdateRequest,
 } from '@/types/laboratorio';
 
-export function listLaboratorios(
+export async function listLaboratorios(
   page = 0,
   pageSize = 10,
 ): Promise<PageResponse<LaboratorioResponse>> {
-  return api
-    .get(endpoints.laboratorios, { params: { page, pageSize } })
-    .then(r => r.data);
+  const { data } = await api.get(endpoints.laboratorios, {
+    params: { page, pageSize },
+  });
+
+  return data;
 }
 
 export function getLaboratorio(id: number): Promise<LaboratorioResponse> {

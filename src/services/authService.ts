@@ -1,4 +1,4 @@
-import { api } from '@/lib/api/axios';
+import { api, authApi, HEADER_SKIP_AUTH_REFRESH } from '@/lib/api/axios';
 import { endpoints } from '@/lib/api/endpoints';
 import {
   AuthDataResponse,
@@ -18,11 +18,33 @@ export async function login(payload: LoginRequest): Promise<AuthDataResponse> {
 }
 
 export async function refresh(): Promise<AuthDataResponse> {
-  const { data } = await api.post(endpoints.auth.refresh);
+  const controller = new AbortController();
+  const t = setTimeout(() => {
+    controller.abort;
+  }, 10000);
+
+  const { data } = await authApi.post(
+    endpoints.auth.refresh,
+    {},
+    {
+      signal: controller.signal,
+      headers: { [HEADER_SKIP_AUTH_REFRESH]: 'true' },
+    },
+  );
+
+  clearTimeout(t);
   return data;
 }
 
 export async function me(): Promise<User> {
   const { data } = await api.get(endpoints.auth.me);
   return data;
+}
+
+export async function logout(): Promise<void> {
+  await authApi.post(
+    endpoints.auth.logout,
+    {},
+    { headers: { [HEADER_SKIP_AUTH_REFRESH]: 'true' } },
+  );
 }

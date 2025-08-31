@@ -20,29 +20,31 @@ import {
   UserIcon,
   UserRoundPlusIcon,
 } from 'lucide-react';
-import { redirect, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import SignupModal from '../signup/SignupModal';
 import { CalloutMessage } from '@/design-system/components/CalloutMessage';
-import { Loader } from '@/design-system/feedback/Loader';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginForm() {
   const [showPassword, setShowpassword] = useState(false);
   const [errorMsg, setError] = useState<React.ReactNode | null>(null);
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [modalAberto, setModalAberto] = useState(false);
 
-  const { push } = useRouter();
-  const { login, isLoading } = useAuth();
+  const router = useRouter();
+  const { login } = useAuth();
 
   const searchParams = useSearchParams();
+
   const unauthorized = searchParams.get('unauthorized');
   const registered = searchParams.get('registered');
 
+  const isLogout = searchParams.get('logout');
+
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setLoadingSubmit(true);
+    setIsLoading(true);
     setError(null);
 
     const formData = new FormData(e.currentTarget);
@@ -60,28 +62,26 @@ export default function LoginForm() {
 
       if (returnUrl) {
         sessionStorage.removeItem('returnUrl');
-        push(returnUrl);
+        router.push(returnUrl);
       } else {
-        push('/dashboard');
+        router.push('/dashboard');
       }
     } catch (e: any) {
       setError(<>{e.message}</>);
     } finally {
-      setLoadingSubmit(false);
+      setIsLoading(false);
     }
-  }
-
-  if (isLoading) {
-    return (
-      <Flex justify={'center'} align={'center'} height={'5rem'}>
-        <Loader size="2" />
-      </Flex>
-    );
   }
 
   return (
     <>
       <form className="flex flex-col gap-4" onSubmit={handleLogin}>
+        {isLogout && (
+          <CalloutMessage type="success">
+            <Text>Logout realizado com sucesso.</Text>
+          </CalloutMessage>
+        )}
+
         {unauthorized && (
           <CalloutMessage type="alert">
             <Text>
@@ -109,7 +109,7 @@ export default function LoginForm() {
             name="username"
             type="text"
             size={'3'}
-            disabled={loadingSubmit}
+            disabled={isLoading}
             required
           >
             <TextField.Slot>
@@ -131,7 +131,7 @@ export default function LoginForm() {
             name="password"
             type={showPassword ? 'text' : 'password'}
             size={'3'}
-            disabled={loadingSubmit}
+            disabled={isLoading}
             required
           >
             <TextField.Slot>
@@ -146,7 +146,7 @@ export default function LoginForm() {
                   size={'1'}
                   variant="ghost"
                   type="button"
-                  disabled={loadingSubmit}
+                  disabled={isLoading}
                   onClick={e => setShowpassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -169,7 +169,7 @@ export default function LoginForm() {
                 id="rememberMe"
                 variant="soft"
                 size="2"
-                disabled={loadingSubmit}
+                disabled={isLoading}
                 highContrast
               />
               Manter conectado
@@ -182,8 +182,8 @@ export default function LoginForm() {
             className="grow"
             type="submit"
             variant="solid"
-            disabled={loadingSubmit}
-            loading={loadingSubmit}
+            disabled={isLoading}
+            loading={isLoading}
           >
             <LogInIcon />
             <Text>Entrar</Text>
@@ -194,7 +194,7 @@ export default function LoginForm() {
             color="gray"
             variant="soft"
             type="button"
-            disabled={loadingSubmit}
+            disabled={isLoading}
             onClick={e => setModalAberto(true)}
           >
             <UserRoundPlusIcon />

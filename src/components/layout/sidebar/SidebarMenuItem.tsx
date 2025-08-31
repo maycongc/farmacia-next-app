@@ -1,32 +1,33 @@
 import Link from 'next/link';
-import type { MenuItem } from '../AppSidebar';
 import { SidebarSubmenu } from './SidebarSubmenu';
+import { useAuth } from '@/hooks/useAuth';
+import { MenuItem } from '@/lib/sidebarMenuItems';
 import { hasPermission } from '@/utils/permissions';
 
 interface SidebarMenuItemProps {
   item: MenuItem;
-  user: any;
+  setExpanded: (expanded: boolean) => void;
   openSubmenu: string | null;
   setOpenSubmenu: (label: string | null) => void;
-  onClose?: () => void;
 }
 
 export function SidebarMenuItem({
   item,
-  user,
+  setExpanded,
   openSubmenu,
   setOpenSubmenu,
-  onClose,
 }: SidebarMenuItemProps) {
+  const { user } = useAuth();
+  const Icon = item.icon;
+
   if (item.permission && !hasPermission(user ?? {}, item.permission)) {
     return null;
   }
-  const Icon = item.icon;
+
   if (item.submenu) {
     return (
       <SidebarSubmenu
         item={item}
-        user={user}
         openSubmenu={openSubmenu}
         setOpenSubmenu={setOpenSubmenu}
       />
@@ -36,7 +37,7 @@ export function SidebarMenuItem({
     <Link href={item.href || '#'} className="block w-full max-w-full">
       <button
         className="flex items-center w-full max-w-full py-2 px-2 rounded hover:bg-brand-50/40 font-medium transition-all"
-        onClick={() => onClose && onClose()}
+        onClick={() => setExpanded(false)}
         style={{ minWidth: 0 }}
       >
         {Icon && (

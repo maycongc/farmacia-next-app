@@ -1,7 +1,7 @@
-import { PageResponse } from '@/types/common';
-import { RemedioRequest, RemedioResponse } from '@/types/remedio';
 import { api } from '@/lib/api/axios';
 import { endpoints } from '@/lib/api/endpoints';
+import { PageResponse } from '@/types/common';
+import { RemedioRequest, RemedioResponse } from '@/types/remedio';
 
 export function listRemedios(
   page = 0,
