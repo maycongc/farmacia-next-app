@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ReactNode, useEffect } from 'react';
 import GlobalLoader from './GlobalLoader';
 import { useAuth } from '@/hooks/useAuth';
@@ -9,6 +9,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const { isAuthenticated, isRestoringAuth } = useAuth();
   const router = useRouter();
   const pathName = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (isRestoringAuth) return;
@@ -27,7 +28,7 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
 
         // Salva a rota que tentou acessar para retornar após o login
         const returnUrl = pathName === '/' ? '/dashboard' : pathName;
-        sessionStorage.setItem('returnUrl', returnUrl);
+        sessionStorage.setItem('returnUrl', `${returnUrl}?${searchParams}`);
 
         router.replace('/login?unauthorized=1');
       } catch {
@@ -42,11 +43,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
       router.replace('/dashboard');
       return;
     }
-  }, [isAuthenticated, isRestoringAuth, router, pathName]);
+  }, [isAuthenticated, isRestoringAuth, router, pathName, searchParams]);
 
   if (isRestoringAuth) return <GlobalLoader />;
 
-  if (isAuthenticated && !isRestoringAuth) return <>{children}</>;
+  if (!isAuthenticated) return <GlobalLoader />;
 
-  return null;
+  return <>{children}</>;
 }

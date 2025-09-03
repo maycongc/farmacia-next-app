@@ -13,14 +13,7 @@ export default function SignupModal({
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
-      <DialogContent
-        aria-describedby={undefined}
-        maxHeight={'90dvh'}
-        maxWidth={{
-          initial: '26rem',
-        }}
-        className="overflow-none"
-      >
+      <DialogContent className="overflow-none w-fit relative">
         <Dialog.Title
           size={{ initial: '4', xs: '5', sm: '6' }}
           weight={'medium'}
@@ -28,7 +21,7 @@ export default function SignupModal({
           Cadastrar novo usuário
         </Dialog.Title>
 
-        <Inset clip={'padding-box'} side={'x'} my={'2'}>
+        <Inset clip={'padding-box'} side={'x'} my={'1'}>
           <Separator size={'4'} />
         </Inset>
 

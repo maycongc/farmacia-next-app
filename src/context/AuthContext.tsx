@@ -1,5 +1,6 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { createContext, ReactNode, useEffect, useRef, useState } from 'react';
 import { clearFlag, getTs, setFlag } from '@/lib/authStorage';
 import {
@@ -47,6 +48,7 @@ export function AuthProvider({
   const [user, setUser] = useState<User | null>(initialUser ?? null);
   const [isRestoringAuth, setIsRestoringAuth] = useState(true);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const broadcastRef = useRef<BroadcastChannel | null>(null);
 
@@ -93,7 +95,7 @@ export function AuthProvider({
 
       const token = getAccessToken();
 
-      if (token) {
+      if (token && !user) {
         try {
           const usuarioAutenticado = await me();
           setUser(usuarioAutenticado);
@@ -151,6 +153,37 @@ export function AuthProvider({
   useEffect(() => {
     const bc = broadcastRef.current;
 
+    const hanfleLogoutSignal = (ts?: number) => {
+      setIsRestoringAuth(false);
+
+      clearTokens();
+      setUser(null);
+      queryClient.clear();
+
+      const path = window.location.pathname;
+
+      try {
+        if (typeof window !== 'undefined') {
+          if (!sessionStorage.getItem('returnUrl')) {
+            const currentUrl =
+              path + window.location.search + window.location.hash;
+
+            try {
+              sessionStorage.setItem('returnUrl', currentUrl);
+            } catch {}
+          }
+        }
+      } catch {}
+
+      try {
+        if (typeof window !== 'undefined') {
+          if (!path.startsWith('/login')) {
+            router.replace('/login?logout=1');
+          }
+        }
+      } catch (e) {}
+    };
+
     if (bc) {
       bc.onmessage = ev => {
         const { type, ts } = ev.data || {};
@@ -203,6 +236,7 @@ export function AuthProvider({
     clearFlag(LOGOUT_KEY);
 
     const { usuario, accessToken } = await doLogin(data);
+
     setAccessToken(accessToken);
     setUser(usuario);
 

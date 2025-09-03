@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Avatar,
   Badge,
@@ -30,8 +28,14 @@ import {
   UsersIcon,
   XCircleIcon,
 } from 'lucide-react';
+import { Metadata } from 'next';
 import MainLayout from '@/components/layout/MainLayout';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | Farmacia App',
+  description: 'Painel de controle do sistema',
+};
 
 function getStats() {
   return [

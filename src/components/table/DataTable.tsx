@@ -4,10 +4,12 @@ import { DataTableHeader } from './datatable/DataTableHeader';
 import { DataTableRow } from './datatable/DataTableRow';
 import { useSelection } from '@/context/SelectionContext';
 
-interface Column<T> {
+export interface Column<T> {
   header: string;
   accessor: (row: T) => ReactNode;
   className?: string;
+  spanClassName?: string;
+  align?: 'center' | 'justify' | 'left' | 'right' | 'char' | undefined;
 }
 
 interface DataTableProps<T> {
@@ -27,28 +29,6 @@ export function DataTable<T>({
   selectable = false,
   className = '',
 }: DataTableProps<T>) {
-  const { selected, select, deselect, clear, isSelected, selectMany } =
-    useSelection();
-  const selectedRows = Array.from(selected);
-
-  const isAllSelected = rows.length > 0 && selectedRows.length === rows.length;
-
-  function handleSelectRow(id: string | number) {
-    if (isSelected(id)) {
-      deselect(id);
-    } else {
-      select(id);
-    }
-  }
-
-  function handleSelectAll() {
-    if (isAllSelected) {
-      rows.forEach(row => deselect(keyExtractor(row)));
-    } else {
-      selectMany(rows.map(keyExtractor));
-    }
-  }
-
   return (
     <>
       <div className="w-full max-w-full overflow-x-auto overflow-y-auto border border-[hsl(var(--color-border))] rounded-lg max-h-[60vh] relative">
@@ -56,10 +36,9 @@ export function DataTable<T>({
           <DataTableHeader
             columns={columns}
             selectable={selectable}
-            isAllSelected={isAllSelected}
-            selectedRowsCount={selectedRows.length}
-            onSelectAll={handleSelectAll}
+            onSelectAll={() => {}}
           />
+
           <tbody>
             {rows.length === 0 && (
               <DataTableEmpty
@@ -67,18 +46,16 @@ export function DataTable<T>({
                 message={emptyMessage}
               />
             )}
-            {rows.map(row => {
-              const id = keyExtractor(row);
-              const isSelected = selectedRows.includes(id);
+
+            {rows.map((row, i) => {
               return (
                 <DataTableRow
-                  key={id}
+                  key={i}
                   row={row}
                   columns={columns}
-                  keyExtractor={keyExtractor}
                   selectable={selectable}
-                  isSelected={isSelected}
-                  onSelectRow={handleSelectRow}
+                  isSelected={false}
+                  onSelectRow={() => {}}
                 />
               );
             })}

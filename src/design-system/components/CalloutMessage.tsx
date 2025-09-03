@@ -7,10 +7,10 @@ import {
 } from 'lucide-react';
 import React from 'react';
 
-type Types = 'alert' | 'error' | 'info' | 'success';
+export type CalloutTypes = 'alert' | 'error' | 'info' | 'success';
 
 type TypeProps = {
-  [k in Types]: {
+  [k in CalloutTypes]: {
     color?: 'amber' | 'tomato' | 'blue' | 'grass';
     icon: React.JSX.Element;
   };
@@ -57,7 +57,7 @@ type sizeTextProps = Partial<
 type CalloutProps = React.ComponentPropsWithoutRef<typeof Callout.Root>;
 
 type CalloutMessageProps = CalloutProps & {
-  type: Types;
+  type: CalloutTypes;
   sizeText?: sizeTextProps;
 };
 

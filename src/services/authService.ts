@@ -13,7 +13,9 @@ export async function register(payload: RegisterRequest): Promise<boolean> {
 }
 
 export async function login(payload: LoginRequest): Promise<AuthDataResponse> {
-  const { data } = await api.post(endpoints.auth.login, payload);
+  const { data } = await authApi.post(endpoints.auth.login, payload, {
+    headers: { [HEADER_SKIP_AUTH_REFRESH]: 'true' },
+  });
   return data;
 }
 

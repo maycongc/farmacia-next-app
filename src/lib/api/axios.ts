@@ -1,5 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { clearFlag, setFlag } from '../authStorage';
 import { endpoints } from './endpoints';
+import { LOGIN_KEY, LOGOUT_KEY } from '@/context/AuthContext';
 
 declare module 'axios' {
   interface InternalAxiosRequestConfig {
@@ -149,8 +151,31 @@ api.interceptors.response.use(
       return api(originalRequest);
     } catch (refreshError) {
       // Se refresh falha, limpa dados e redireciona para login
+
+      try {
+        if (typeof window !== 'undefined') {
+          const returnUrl =
+            window.location.pathname +
+            window.location.search +
+            window.location.hash;
+
+          try {
+            sessionStorage.setItem('returnUrl', returnUrl);
+          } catch {}
+
+          try {
+            setFlag(LOGOUT_KEY, Date.now());
+          } catch (e) {}
+
+          try {
+            clearFlag(LOGIN_KEY);
+          } catch (e) {}
+
+          window.location.href = '/login?unauthorized=2';
+        }
+      } catch {}
+
       processQueue(refreshError, null);
-      sessionStorage.removeItem('accessToken');
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

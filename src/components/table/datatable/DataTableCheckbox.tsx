@@ -1,29 +1,31 @@
-import CustomCheckbox from '@/design-system/components/CustomCheckbox';
+import { Checkbox, Flex, Tooltip } from '@radix-ui/themes';
 
-interface DataTableCheckboxProps {
-  checked: boolean;
-  indeterminate?: boolean;
-  onChange: () => void;
+type DataTableCheckboxProps = {
+  checked?: boolean;
+  contentEditable?: boolean;
+  toolTip?: string;
   className?: string;
-}
+  variant?: 'surface' | 'classic' | 'soft' | undefined;
+};
 
 export function DataTableCheckbox({
   checked,
-  indeterminate = false,
-  onChange,
+  toolTip,
+  contentEditable,
   className,
+  variant,
 }: DataTableCheckboxProps) {
   return (
-    <div
-      className={
-        className || 'flex items-center justify-center h-full min-h-[26px]'
-      }
-    >
-      <CustomCheckbox
-        checked={checked}
-        indeterminate={indeterminate}
-        onChange={onChange}
-      />
-    </div>
+    <Tooltip content={toolTip} hidden={!toolTip}>
+      <Flex align={'center'} justify={'center'} className="h-full">
+        <Checkbox
+          size={'3'}
+          checked={checked}
+          contentEditable={contentEditable}
+          variant={variant}
+          className={className}
+        />
+      </Flex>
+    </Tooltip>
   );
 }

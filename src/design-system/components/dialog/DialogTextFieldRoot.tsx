@@ -12,6 +12,7 @@ export const DialogTextFieldRoot = React.forwardRef<
   return (
     <TextField.Root
       variant={variant ? variant : 'surface'}
+      mx={'1'}
       size={{
         sm: '3',
       }}

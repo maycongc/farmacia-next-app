@@ -16,18 +16,14 @@ export function PublicRoute({
   const router = useRouter();
 
   useEffect(() => {
-    if (!isRestoringAuth) return;
+    if (isRestoringAuth) return;
 
     if (isAuthenticated) {
       router.replace(redirectTo);
     }
   }, [isRestoringAuth, isAuthenticated, router, redirectTo]);
 
-  if (isRestoringAuth) {
-    return <GlobalLoader />;
-  }
+  if (isRestoringAuth) return <GlobalLoader />;
 
-  if (!isAuthenticated) return <>{children}</>;
-
-  return null;
+  return <>{children}</>;
 }

@@ -21,31 +21,85 @@ import {
   UserRoundPlusIcon,
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { z } from 'zod';
 import SignupModal from '../signup/SignupModal';
-import { CalloutMessage } from '@/design-system/components/CalloutMessage';
+import {
+  CalloutMessage,
+  CalloutTypes,
+} from '@/design-system/components/CalloutMessage';
 import { useAuth } from '@/hooks/useAuth';
+
+type MsgProps = {
+  message: string;
+  type: CalloutTypes;
+};
+
+type ErroProps = {
+  username?: string[] | undefined;
+  senha?: string[] | undefined;
+  rememberMe?: string[] | undefined;
+};
+
+const loginSchema = z.object({
+  username: z
+    .string()
+    .min(3, 'Login deve ter no mínimo 3 caracteres.')
+    .transform(v => v.trim()),
+
+  senha: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
+  rememberMe: z.boolean().optional(),
+});
 
 export default function LoginForm() {
   const [showPassword, setShowpassword] = useState(false);
-  const [errorMsg, setError] = useState<React.ReactNode | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [modalAberto, setModalAberto] = useState(false);
+  const [msg, setMsg] = useState<MsgProps | null>();
+  const [erros, setErros] = useState<ErroProps | null>();
 
   const router = useRouter();
   const { login } = useAuth();
 
   const searchParams = useSearchParams();
 
-  const unauthorized = searchParams.get('unauthorized');
-  const registered = searchParams.get('registered');
+  useEffect(() => {
+    if (searchParams.has('unauthorized', '1')) {
+      setMsg(() => ({
+        type: 'alert',
+        message: 'Você precisa estar autenticado para acessar esta página.',
+      }));
+    }
 
-  const isLogout = searchParams.get('logout');
+    if (searchParams.has('unauthorized', '2')) {
+      setMsg(() => ({
+        type: 'alert',
+        message:
+          'Sua sessão expirou, realize login novamente para retomar de onde parou!',
+      }));
+    }
+
+    if (searchParams.has('registered')) {
+      setMsg(() => ({
+        type: 'success',
+        message:
+          'Usuário registrado com sucesso! Você já pode acessar a sua conta.',
+      }));
+    }
+
+    if (searchParams.has('logout')) {
+      setMsg(() => ({
+        type: 'success',
+        message: 'Logout realizado com sucesso!',
+      }));
+    }
+  }, [searchParams]);
 
   async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
-    setError(null);
+    msg && setMsg(null);
+    erros && setErros(null);
 
     const formData = new FormData(e.currentTarget);
 
@@ -54,6 +108,14 @@ export default function LoginForm() {
       senha: formData.get('password') as string,
       rememberMe: formData.get('rememberMe') !== null,
     };
+
+    const parsed = loginSchema.safeParse(data);
+
+    if (!parsed.success) {
+      setErros(() => parsed.error.flatten().fieldErrors);
+      setIsLoading(false);
+      return;
+    }
 
     try {
       await login(data);
@@ -67,7 +129,12 @@ export default function LoginForm() {
         router.push('/dashboard');
       }
     } catch (e: any) {
-      setError(<>{e.message}</>);
+      setMsg(() => ({
+        message:
+          (e?.response?.data?.message as string) || (e?.message as string),
+
+        type: 'error',
+      }));
     } finally {
       setIsLoading(false);
     }
@@ -76,29 +143,11 @@ export default function LoginForm() {
   return (
     <>
       <form className="flex flex-col gap-4" onSubmit={handleLogin}>
-        {isLogout && (
-          <CalloutMessage type="success">
-            <Text>Logout realizado com sucesso.</Text>
+        {msg && (
+          <CalloutMessage type={msg.type}>
+            <Text>{msg.message}</Text>
           </CalloutMessage>
         )}
-
-        {unauthorized && (
-          <CalloutMessage type="alert">
-            <Text>
-              Você precisa estar autenticado para acessar esta página.
-            </Text>
-          </CalloutMessage>
-        )}
-
-        {registered && (
-          <CalloutMessage type="success">
-            <Text>
-              Usuário registrado com sucesso! Você já pode acessar a sua conta.
-            </Text>
-          </CalloutMessage>
-        )}
-
-        {errorMsg && <CalloutMessage type="error">{errorMsg}</CalloutMessage>}
 
         <Heading>Acessar conta</Heading>
 
@@ -110,12 +159,14 @@ export default function LoginForm() {
             type="text"
             size={'3'}
             disabled={isLoading}
-            required
           >
             <TextField.Slot>
               <UserIcon />
             </TextField.Slot>
           </TextField.Root>
+          <Text hidden={!erros?.username} color="red">
+            {erros?.username}
+          </Text>
         </Box>
 
         <Box className="flex flex-col gap-1">
@@ -132,7 +183,6 @@ export default function LoginForm() {
             type={showPassword ? 'text' : 'password'}
             size={'3'}
             disabled={isLoading}
-            required
           >
             <TextField.Slot>
               <LockIcon />
@@ -158,6 +208,9 @@ export default function LoginForm() {
               </Tooltip>
             </TextField.Slot>
           </TextField.Root>
+          <Text hidden={!erros?.senha} color="red">
+            {erros?.senha}
+          </Text>
         </Box>
 
         <Flex justify={'center'}>

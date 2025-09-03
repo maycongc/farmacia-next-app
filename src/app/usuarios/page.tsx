@@ -8,7 +8,8 @@ import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
 import { Pagination } from '@/components/table/Pagination';
 import { listUsuarios } from '@/services/usuarioService';
-import { formatDate, formatDateTime } from '@/utils/formatters';
+import { UsuarioResponse } from '@/types/usuario';
+import { formatDate } from '@/utils/formatters';
 
 export default function UsuariosPage() {
   const [pagination, setPagination] = React.useState({ page: 0, pageSize: 10 });
@@ -29,11 +30,11 @@ export default function UsuariosPage() {
             </div>
           ) : (
             <div className="transition-opacity duration-500 opacity-100">
-              <DataTable
+              <DataTable<UsuarioResponse>
                 rows={rows}
                 keyExtractor={r => r.id}
                 columns={[
-                  { header: 'ID', accessor: r => r.id },
+                  { header: 'ID', accessor: r => r.id, align: 'right' },
                   { header: 'Usuario', accessor: r => r.username },
                   { header: 'Nome', accessor: r => r.nome },
                   { header: 'Email', accessor: r => r.email },
@@ -44,21 +45,14 @@ export default function UsuariosPage() {
                   },
                   { header: 'Telefone', accessor: r => r.telefone },
                   { header: 'CEP', accessor: r => r.cep },
-                  { header: 'Endereço', accessor: r => r.email },
-                  { header: 'Complemento', accessor: r => r.email },
-                  { header: 'Cidade', accessor: r => r.email },
-                  { header: 'UF', accessor: r => r.email },
+                  { header: 'Endereço', accessor: r => r.endereco },
+                  { header: 'Complemento', accessor: r => r.complemento },
+                  { header: 'Cidade', accessor: r => r.cidade },
+                  { header: 'UF', accessor: r => r.uf, align: 'center' },
                   {
                     header: 'Admin',
                     accessor: r => !!r.isAdmin,
-                  },
-                  {
-                    header: 'Criado em',
-                    accessor: r => formatDateTime(r.createdAt),
-                  },
-                  {
-                    header: 'Atualizado em',
-                    accessor: r => formatDateTime(r.updatedAt),
+                    align: 'center',
                   },
                 ]}
               />

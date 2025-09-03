@@ -1,57 +1,50 @@
-import { Tooltip } from '@radix-ui/themes';
+import { Checkbox, Text, Tooltip } from '@radix-ui/themes';
 import { clsx } from 'clsx';
-import CustomCheckbox from '@/design-system/components/CustomCheckbox';
-import { EllipsisTooltip } from '@/design-system/components/EllipsisTooltip';
+import { Column } from '../DataTable';
+import { DataTableCheckbox } from './DataTableCheckbox';
 
-interface DataTableCellProps {
-  value: any;
-  className?: string;
-  header?: string;
+interface DataTableCellProps<T> {
+  row: T;
+  column: Column<T>;
 }
 
-export function DataTableCell({
-  value,
-  className,
-  header,
-}: DataTableCellProps) {
-  const isId = header?.toLowerCase() === 'id';
-  const style = isId
-    ? {
-        maxWidth: 64,
-        width: 64,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }
-    : {
-        maxWidth: 180,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      };
+export function DataTableCell<T>({ column, row }: DataTableCellProps<T>) {
+  const value = column.accessor(row);
+  const isId = column.header?.toLowerCase() === 'id';
+
+  const isValueString = typeof value === 'string';
+  const isValueNumber = typeof value === 'number';
+  const isValueBoolean = typeof value === 'boolean';
 
   return (
     <td
+      align={
+        column.align ||
+        (isValueNumber ? 'right' : isValueBoolean ? 'center' : 'left')
+      }
       className={clsx(
         'px-3 py-1 truncate',
-        className,
+        column.className,
         isId ? 'max-w-[64px] w-[64px]' : 'max-w-[180px]',
       )}
-      style={style}
     >
-      <Tooltip content={value}>
-        <span className="inline-block">
-          {typeof value === 'boolean' ? (
-            <CustomCheckbox checked={value} />
-          ) : typeof value === 'string' ? (
-            value
-          ) : typeof value === 'number' ? (
-            String(value)
-          ) : (
-            value
-          )}
-        </span>
-      </Tooltip>
+      {isValueBoolean ? (
+        <DataTableCheckbox
+          checked={value}
+          contentEditable={false}
+          toolTip={value ? 'Sim' : 'Não'}
+          className="cursor-not-allowed"
+          variant="soft"
+        />
+      ) : isValueNumber || isValueString ? (
+        <Tooltip content={value}>
+          <Text truncate className={column.spanClassName}>
+            {value}
+          </Text>
+        </Tooltip>
+      ) : (
+        value
+      )}
     </td>
   );
 }
