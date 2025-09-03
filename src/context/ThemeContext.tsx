@@ -1,7 +1,7 @@
 'use client';
+
 import { Theme } from '@radix-ui/themes';
 import { createContext, ReactNode, useEffect, useState } from 'react';
-import GlobalLoaderOverlay from '@/components/layout/GlobalLoaderOverlay';
 import PortalClienteInitializer from '@/components/portal/PortalClientInitializer.client';
 
 type Theme = 'light' | 'dark';
@@ -76,7 +76,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       >
         <PortalClienteInitializer />
         {children}
-        <GlobalLoaderOverlay />
       </Theme>
     </ThemeContext.Provider>
   );
