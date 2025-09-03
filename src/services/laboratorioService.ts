@@ -10,9 +10,11 @@ import {
 export async function listLaboratorios(
   page = 0,
   pageSize = 10,
+  sortBy?: string | null,
+  order?: string | null,
 ): Promise<PageResponse<LaboratorioResponse>> {
   const { data } = await api.get(endpoints.laboratorios, {
-    params: { page, pageSize },
+    params: { page, pageSize, sortBy, order },
   });
 
   return data;

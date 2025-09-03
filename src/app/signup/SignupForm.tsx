@@ -25,7 +25,7 @@ import { useState } from 'react';
 import z from 'zod';
 import TextErrorFormValidation from '@/components/TextErrorFormValidation';
 import { CalloutMessage } from '@/design-system/components/CalloutMessage';
-import { DialogTextFieldRoot } from '@/design-system/components/dialog/DialogTextFieldRoot';
+import { DialogTextFieldRoot } from '@/components/layout/dialog/DialogTextFieldRoot';
 import { useAuth } from '@/hooks/useAuth';
 
 type ValidationErroProps = {

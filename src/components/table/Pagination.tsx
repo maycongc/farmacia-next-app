@@ -2,27 +2,24 @@
 interface PaginationProps {
   totalItems: number;
   onChange: (params: { page: number; pageSize: number }) => void;
-  initialPageSize?: number;
+  pagination?: { page: number; pageSize: number };
   pageSizeOptions?: number[];
   className?: string;
 }
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React, { useState } from 'react';
-import { Button } from '@/design-system/components/Button';
+import { Button } from '@radix-ui/themes';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 import CustomSelect from '@/design-system/components/CustomSelect';
 
 export function Pagination({
   totalItems,
   onChange,
-  initialPageSize = 10,
+  pagination = { page: 0, pageSize: 10 },
   pageSizeOptions = [5, 10, 20, 50],
   className = '',
 }: PaginationProps) {
-  const [page, setPage] = useState(0);
-  const [pageSize, setPageSize] = useState(initialPageSize);
-
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  const totalPages = Math.max(1, Math.ceil(totalItems / pagination.pageSize));
 
   // Gera páginas com reticências, mostrando sempre as 2 primeiras, 2 últimas, página atual e vizinhas
   const getPages = (page: number, maxPages: number): (number | string)[] => {
@@ -58,16 +55,13 @@ export function Pagination({
     );
   };
 
-  const pages = getPages(page, totalPages);
+  const pages = getPages(pagination.page, totalPages);
 
   function handleSetPage(p: number) {
-    setPage(p);
-    onChange({ page: p, pageSize });
+    onChange({ page: p, pageSize: pagination.pageSize });
   }
 
   function handlePageSizeChange(size: number) {
-    setPageSize(size);
-    setPage(0);
     onChange({ page: 0, pageSize: size });
   }
 
@@ -76,11 +70,11 @@ export function Pagination({
       <div className="mb-4 ml-2 w-full text-left">
         <span className="text-xs text-gray-700 dark:text-gray-100 max-w-full font-medium truncate whitespace-nowrap block">
           <span className="font-bold text-blue-500">
-            {Math.min(pageSize * page + 1, totalItems)}
+            {Math.min(pagination.pageSize * pagination.page + 1, totalItems)}
           </span>
           {' ao '}
           <span className="font-bold text-blue-500">
-            {Math.min(pageSize * (page + 1), totalItems)}
+            {Math.min(pagination.pageSize * (pagination.page + 1), totalItems)}
           </span>
           {` de ${totalItems} registros`}
         </span>
@@ -89,14 +83,14 @@ export function Pagination({
       <div className="flex flex-col sm:flex-row flex-wrap items-center gap-2 w-full">
         <div className="flex flex-row flex-wrap items-center gap-1 w-full sm:w-auto justify-center">
           <Button
-            intent="ghost"
-            size="sm"
-            onClick={() => handleSetPage(Math.max(page - 1, 0))}
-            disabled={page === 0}
-            className="rounded-full px-2 flex items-center justify-center"
+            variant="ghost"
+            size="2"
+            onClick={() => handleSetPage(Math.max(pagination.page - 1, 0))}
+            disabled={pagination.page === 0}
+            className="m-0 rounded-full px-2 flex items-center justify-center"
             aria-label="Página anterior"
           >
-            <ChevronLeft size={18} className="inline-block align-middle" />
+            <ChevronLeftIcon size={18} className="inline-block align-middle" />
           </Button>
           <nav
             aria-label="Navegação de páginas"
@@ -106,16 +100,16 @@ export function Pagination({
               typeof p === 'number' ? (
                 <Button
                   key={`page-${p}`}
-                  intent={p === page ? 'primary' : 'ghost'}
-                  size="sm"
+                  variant={p === pagination.page ? 'surface' : 'ghost'}
+                  size="2"
                   onClick={() => handleSetPage(p)}
-                  disabled={p === page}
-                  className={`rounded px-2 transition-all duration-150 ${
-                    p === page
-                      ? 'bg-blue-600 text-white shadow'
-                      : 'hover:bg-blue-100'
-                  } ${p === page ? 'font-bold' : ''}`}
-                  aria-current={p === page ? 'page' : undefined}
+                  disabled={p === pagination.page}
+                  className={`m-0 rounded px-2 transition-all duration-150 ${
+                    p === pagination.page
+                      ? 'bg-blue-600 text-white shadow w-[32px]'
+                      : 'hover:bg-blue-100 w-[12px]'
+                  } ${p === pagination.page ? 'font-bold' : ''}`}
+                  aria-current={p === pagination.page ? 'page' : undefined}
                   aria-label={`Ir para página ${p + 1}`}
                 >
                   {p + 1}
@@ -132,14 +126,16 @@ export function Pagination({
             )}
           </nav>
           <Button
-            intent="ghost"
-            size="sm"
-            onClick={() => handleSetPage(Math.min(page + 1, totalPages - 1))}
-            disabled={page === totalPages - 1}
-            className="rounded-full px-2 flex items-center justify-center"
+            variant="ghost"
+            size="2"
+            onClick={() =>
+              handleSetPage(Math.min(pagination.page + 1, totalPages - 1))
+            }
+            disabled={pagination.page === totalPages - 1}
+            className="m-0 rounded-full px-2 flex items-center justify-center"
             aria-label="Próxima página"
           >
-            <ChevronRight size={18} className="inline-block align-middle" />
+            <ChevronRightIcon size={18} className="inline-block align-middle" />
           </Button>
         </div>
         <div className="flex flex-row flex-wrap gap-2 w-full sm:w-auto justify-center">
@@ -151,7 +147,7 @@ export function Pagination({
                 value: v,
                 label: String(v),
               }))}
-              value={pageSize}
+              value={pagination.pageSize}
               onChange={v => handlePageSizeChange(Number(v))}
             />
           </div>
@@ -163,7 +159,7 @@ export function Pagination({
                 value: i,
                 label: String(i + 1),
               }))}
-              value={page}
+              value={pagination.page}
               onChange={v => handleSetPage(Number(v))}
             />
           </div>

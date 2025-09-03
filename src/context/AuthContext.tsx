@@ -231,19 +231,25 @@ export function AuthProvider({
   }, []);
 
   async function login(data: LoginRequest) {
+    setIsRestoringAuth(true);
     const now = Date.now();
     setFlag(LOGIN_KEY, now);
     clearFlag(LOGOUT_KEY);
 
-    const { usuario, accessToken } = await doLogin(data);
+    try {
+      const { usuario, accessToken } = await doLogin(data);
 
-    setAccessToken(accessToken);
-    setUser(usuario);
+      setAccessToken(accessToken);
+      setUser(usuario);
 
-    if (broadcastRef.current) {
-      broadcastRef.current.postMessage({ type: LOGIN_EVENT, ts: now });
-    } else {
-      setFlag(LOGIN_KEY, now);
+      if (broadcastRef.current) {
+        broadcastRef.current.postMessage({ type: LOGIN_EVENT, ts: now });
+      } else {
+        setFlag(LOGIN_KEY, now);
+      }
+    } catch (error) {
+    } finally {
+      setIsRestoringAuth(false);
     }
   }
 
@@ -272,9 +278,12 @@ export function AuthProvider({
     const [dia, mes, ano] = data.dataNascimento.split('/');
     const dataFormatada = `${ano}-${mes}-${dia}`;
 
+    const cpfFormatado = data.cpf.replaceAll('.', '').replaceAll('-', '');
+
     const success = await doRegister({
       ...data,
       dataNascimento: dataFormatada,
+      cpf: cpfFormatado,
     });
 
     return success;

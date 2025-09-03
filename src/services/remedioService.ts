@@ -6,9 +6,11 @@ import { RemedioRequest, RemedioResponse } from '@/types/remedio';
 export function listRemedios(
   page = 0,
   pageSize = 10,
+  sortBy: string | null,
+  order: string | null,
 ): Promise<PageResponse<RemedioResponse>> {
   return api
-    .get(endpoints.remedios, { params: { page, pageSize } })
+    .get(endpoints.remedios, { params: { page, pageSize, sortBy, order } })
     .then(r => r.data);
 }
 

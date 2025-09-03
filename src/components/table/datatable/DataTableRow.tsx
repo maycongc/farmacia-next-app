@@ -1,14 +1,9 @@
 import { Skeleton } from '@radix-ui/themes';
 import { clsx } from 'clsx';
 import React from 'react';
+import { Column } from '../DataTable';
 import { DataTableCell } from './DataTableCell';
 import { DataTableCheckbox } from './DataTableCheckbox';
-
-interface Column<T> {
-  header: string;
-  accessor: (row: T) => React.ReactNode;
-  className?: string;
-}
 
 interface DataTableRowProps<T> {
   row: T;

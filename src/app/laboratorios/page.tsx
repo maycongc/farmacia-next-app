@@ -1,8 +1,8 @@
+import { Button } from '@radix-ui/themes';
 import { Metadata } from 'next';
 import LaboratorioTabela from './LaboratorioTabela';
 import MainLayout from '@/components/layout/MainLayout';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
-import { Button } from '@/design-system/components/Button';
 
 export const metadata: Metadata = {
   title: 'Laboratórios | Farmacia App',
@@ -16,8 +16,8 @@ export default function LaboratoriosPage() {
         <div className="flex items-center mb-4 gap-4">
           <h2 className="text-xl font-semibold">Laboratórios</h2>
           <Button
-            intent="outline"
-            size="sm"
+            variant="outline"
+            size="2"
             className="ml-auto w-full sm:w-auto"
           >
             Novo

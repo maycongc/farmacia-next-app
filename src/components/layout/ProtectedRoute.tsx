@@ -26,11 +26,13 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
           return;
         }
 
+        const isRootPath = pathName === '/';
+
         // Salva a rota que tentou acessar para retornar após o login
-        const returnUrl = pathName === '/' ? '/dashboard' : pathName;
+        const returnUrl = isRootPath ? '/dashboard' : pathName;
         sessionStorage.setItem('returnUrl', `${returnUrl}?${searchParams}`);
 
-        router.replace('/login?unauthorized=1');
+        router.replace(`/login${!isRootPath ? '?unauthorized=1' : ''}`);
       } catch {
         router.replace('/login?unauthorized=1');
       } finally {

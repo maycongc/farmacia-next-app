@@ -6,8 +6,10 @@ import { UsuarioResponse } from '@/types/usuario';
 export function listUsuarios(
   page = 0,
   pageSize = 10,
+  sortBy?: string | null,
+  order?: string | null,
 ): Promise<PageResponse<UsuarioResponse>> {
   return api
-    .get(endpoints.usuarios, { params: { page, pageSize } })
+    .get(endpoints.usuarios, { params: { page, pageSize, sortBy, order } })
     .then(r => r.data);
 }

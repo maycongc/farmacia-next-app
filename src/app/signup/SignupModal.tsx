@@ -2,7 +2,7 @@
 
 import { Dialog, Inset, Separator } from '@radix-ui/themes';
 import SignupForm from './SignupForm';
-import { DialogContent } from '@/design-system/components/dialog/Dialog';
+import { DialogContent } from '@/components/layout/dialog/Dialog';
 
 export default function SignupModal({
   open,
