@@ -1,24 +1,18 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { useRouter, useSearchParams } from 'next/navigation';
-import React from 'react';
 import MainLayout from '@/components/layout/MainLayout';
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { DataTable } from '@/components/table/DataTable';
 import { DataTableSkeleton } from '@/components/table/DataTableSkeleton';
 import { Pagination } from '@/components/table/Pagination';
+import { useTableSortAndPagination } from '@/hooks/useTableSortAndPagination';
 import { listRemedios } from '@/services/remedioService';
 import { formatDate, formatDateTime } from '@/utils/formatters';
 
 export default function RemediosPage() {
-  const [pagination, setPagination] = React.useState({ page: 0, pageSize: 10 });
-
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const sortByParam = searchParams.get('sortBy');
-  const orderParam = (searchParams.get('order') ?? 'asc') as 'asc' | 'desc';
+  const { orderParam, sortByParam, pagination, setPagination } =
+    useTableSortAndPagination();
 
   const { data, isLoading } = useQuery({
     queryKey: [
@@ -39,34 +33,6 @@ export default function RemediosPage() {
 
   const rows: any[] = data?.content || [];
 
-  function handleSortClick(column: string) {
-    const isSame = sortByParam === column;
-
-    const nextOrder: 'asc' | 'desc' | null = isSame
-      ? orderParam === 'asc'
-        ? 'desc'
-        : orderParam === 'desc'
-        ? null
-        : 'asc'
-      : 'asc';
-
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (!nextOrder) {
-      params.delete('sortBy');
-      params.delete('order');
-    } else {
-      params.set('sortBy', column);
-      params.set('order', nextOrder);
-    }
-
-    setPagination(prev => ({ ...prev, page: 0 }));
-
-    const qs = '?' + params.toString();
-
-    router.replace(qs);
-  }
-
   return (
     <ProtectedRoute>
       <MainLayout>
@@ -80,7 +46,6 @@ export default function RemediosPage() {
             <div className="transition-opacity duration-500 opacity-100">
               <DataTable
                 rows={rows}
-                handleSortClick={handleSortClick}
                 columns={[
                   {
                     header: 'ID',

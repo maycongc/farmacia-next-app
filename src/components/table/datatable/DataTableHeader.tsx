@@ -3,34 +3,27 @@
 import { Box, Text, Tooltip } from '@radix-ui/themes';
 import { clsx } from 'clsx';
 import {
-  ArrowDownWideNarrowIcon,
-  ArrowUpDownIcon,
-  ArrowUpWideNarrowIcon,
   ChevronDownIcon,
   ChevronsUpDownIcon,
   ChevronUpIcon,
 } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import { Column } from '../DataTable';
 import { DataTableCheckbox } from './DataTableCheckbox';
+import { useTableSortAndPagination } from '@/hooks/useTableSortAndPagination';
 
 interface DataTableHeaderProps<T> {
   columns: Column<T>[];
   selectable: boolean;
   onSelectAll: () => void;
-  handleSortClick: (field: string) => void;
 }
 
 export function DataTableHeader<T>({
   columns,
   selectable,
   onSelectAll,
-  handleSortClick,
 }: DataTableHeaderProps<T>) {
-  const searchParams = useSearchParams();
-
-  const sortBy = searchParams.get('sortBy');
-  const order = (searchParams.get('order') ?? 'asc') as 'asc' | 'desc';
+  const { sortByParam, orderParam, handleSortClick } =
+    useTableSortAndPagination();
 
   return (
     <thead className="bg-[hsl(var(--color-bg-alt-dark))] sticky top-0 z-10">
@@ -43,7 +36,9 @@ export function DataTableHeader<T>({
         {columns.map((c, i) => (
           <Tooltip
             key={i}
-            content={`Ordernar por ${c.header} ${order === 'asc' ? '' : ''}`}
+            content={`Ordernar por ${c.header} ${
+              orderParam === 'asc' ? '' : ''
+            }`}
           >
             <th
               align={c.align || 'left'}
@@ -64,14 +59,14 @@ export function DataTableHeader<T>({
                   c.align === 'right' ? 'left-2' : 'right-2'
                 }`}
               >
-                {sortBy && sortBy === c.sortBy ? (
-                  order === 'asc' ? (
+                {sortByParam && sortByParam === c.sortBy ? (
+                  orderParam === 'asc' ? (
                     <ChevronUpIcon size={20} className="text-blue-500" />
                   ) : (
                     <ChevronDownIcon size={20} className="text-yellow-500" />
                   )
                 ) : (
-                  !sortBy && <ChevronsUpDownIcon size={20} />
+                  !sortByParam && <ChevronsUpDownIcon size={20} />
                 )}
               </Box>
             </th>

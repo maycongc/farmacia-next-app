@@ -2,7 +2,6 @@ import { ReactNode } from 'react';
 import { DataTableEmpty } from './datatable/DataTableEmpty';
 import { DataTableHeader } from './datatable/DataTableHeader';
 import { DataTableRow } from './datatable/DataTableRow';
-import { useSelection } from '@/context/SelectionContext';
 
 export interface Column<T> {
   header: string;
@@ -19,7 +18,6 @@ interface DataTableProps<T> {
   emptyMessage?: string;
   selectable?: boolean;
   className?: string;
-  handleSortClick: (field: string) => void;
 }
 
 export function DataTable<T>({
@@ -28,14 +26,12 @@ export function DataTable<T>({
   emptyMessage = 'Sem registros',
   selectable = false,
   className = '',
-  handleSortClick,
 }: DataTableProps<T>) {
   return (
     <>
       <div className="w-full max-w-full overflow-x-auto overflow-y-auto border border-[hsl(var(--color-border))] rounded-lg max-h-[60vh] relative">
         <table className={`w-full min-w-max text-sm ${className}`}>
           <DataTableHeader
-            handleSortClick={handleSortClick}
             columns={columns}
             selectable={selectable}
             onSelectAll={() => {}}

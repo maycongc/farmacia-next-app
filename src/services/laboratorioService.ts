@@ -20,31 +20,33 @@ export async function listLaboratorios(
   return data;
 }
 
-export function getLaboratorio(id: number): Promise<LaboratorioResponse> {
-  return api.get(`${endpoints.laboratorios}/${id}`).then(r => r.data);
+export async function getLaboratorio(id: number): Promise<LaboratorioResponse> {
+  return await api.get(`${endpoints.laboratorios}/${id}`).then(r => r.data);
 }
 
-export function createLaboratorio(
+export async function createLaboratorio(
   payload: LaboratorioRequest,
 ): Promise<LaboratorioResponse> {
-  return api.post(endpoints.laboratorios, payload).then(r => r.data);
+  return await api.post(endpoints.laboratorios, payload).then(r => r.data);
 }
 
-export function updateLaboratorio(
+export async function updateLaboratorio(
   id: number,
   payload: LaboratorioUpdateRequest,
 ): Promise<LaboratorioResponse> {
-  return api.put(`${endpoints.laboratorios}/${id}`, payload).then(r => r.data);
+  return await api
+    .put(`${endpoints.laboratorios}/${id}`, payload)
+    .then(r => r.data);
 }
 
-export function deleteLaboratorio(id: number): Promise<void> {
-  return api.delete(`${endpoints.laboratorios}/${id}`).then(() => {});
+export async function deleteLaboratorio(id: number) {
+  await api.delete(`${endpoints.laboratorios}/${id}`);
 }
 
-export function deleteLaboratoriosEmLote(
+export async function deleteLaboratoriosEmLote(
   payload: Array<number>,
 ): Promise<void> {
-  return api
+  return await api
     .delete(`${endpoints.laboratorios}/lote`, { data: payload })
     .then(() => {});
 }

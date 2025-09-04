@@ -1,6 +1,7 @@
-import { Skeleton } from '@radix-ui/themes';
+'use client';
+
 import { clsx } from 'clsx';
-import React from 'react';
+import { useState } from 'react';
 import { Column } from '../DataTable';
 import { DataTableCell } from './DataTableCell';
 import { DataTableCheckbox } from './DataTableCheckbox';
@@ -20,6 +21,8 @@ export function DataTableRow<T>({
   isSelected,
   onSelectRow,
 }: DataTableRowProps<T>) {
+  const [menuIsOpen, setMenuIsOpen] = useState(false);
+
   return (
     <tr
       className={clsx(
@@ -28,7 +31,7 @@ export function DataTableRow<T>({
         'transition-colors',
         'hover:bg-blue-200/80',
         'dark:hover:bg-gray-700/60',
-        isSelected && 'bg-blue-200 dark:bg-gray-700',
+        (isSelected || menuIsOpen) && 'bg-blue-200 dark:bg-gray-700',
       )}
     >
       {selectable && (
@@ -38,7 +41,12 @@ export function DataTableRow<T>({
       )}
 
       {columns.map((c, i) => (
-        <DataTableCell key={i} row={row} column={c} />
+        <DataTableCell
+          key={i}
+          row={row}
+          column={c}
+          setMenuIsOpen={setMenuIsOpen}
+        />
       ))}
     </tr>
   );
